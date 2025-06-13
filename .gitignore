@@ -1,1 +1,4 @@
 .venv/
+shap_e_model_cache/
+*.glb
+*.glb.meta
