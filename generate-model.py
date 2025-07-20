@@ -6,12 +6,12 @@ from pathlib import Path
 import typer
 import ollama
 
-app = typer.Typer()
+app = typer.Typer(add_completion=False)
 
 
 def get_objects_for_scene(scene_type: str) -> list[str]:
     prompt = (
-        f"List 10 one word objects you might find in a: city"
+        f"List 10 one word objects you might find in a: {scene_type}"
         "Format your answer as a bullet point list."
         "Do not include anything else in the result"
     )
