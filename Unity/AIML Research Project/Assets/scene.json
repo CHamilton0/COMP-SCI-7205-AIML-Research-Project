@@ -1,43 +1,112 @@
 {
-    "stable_diffusion_scene_skybox_prompt": "A breathtaking view of outer space filled with vibrant star clusters, distant galaxies, swirling nebulae, and a prominent view of a nearby planet with visible atmospheric layers.",
+    "stable_diffusion_scene_skybox_prompt": "A vast expanse of deep space, filled with distant stars and nebulae glowing in vibrant colors. The scene is dominated by a large spiral galaxy swirling in the distance, with a few bright planets visible against a backdrop of countless twinkling stars.",
     "objects": [
         {
-            "name": "Spaceship",
+            "name": "Spacecraft",
             "position": {
                 "x": 0.0,
-                "y": -1.0,
-                "z": 5.0
+                "y": 0.0,
+                "z": -10.0
             },
             "size": {
                 "x": 2.0,
-                "y": 2.0,
-                "z": 6.0
+                "y": 1.0,
+                "z": 4.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 45.0,
+                "z": 0.0
             }
         },
         {
             "name": "Asteroid",
             "position": {
-                "x": 3.0,
-                "y": 1.0,
-                "z": 8.0
+                "x": 5.0,
+                "y": 3.0,
+                "z": -15.0
             },
             "size": {
                 "x": 1.0,
                 "y": 1.0,
                 "z": 1.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 20.0,
+                "y": 10.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Asteroid",
+            "position": {
+                "x": -3.0,
+                "y": -2.0,
+                "z": -5.0
+            },
+            "size": {
+                "x": 1.5,
+                "y": 1.5,
+                "z": 1.5
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 30.0,
+                "z": 10.0
             }
         },
         {
             "name": "Satellite",
             "position": {
-                "x": -2.0,
-                "y": 2.0,
-                "z": 10.0
+                "x": -4.0,
+                "y": 1.0,
+                "z": -8.0
             },
             "size": {
-                "x": 1.0,
+                "x": 0.5,
                 "y": 0.5,
                 "z": 1.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 15.0,
+                "y": 0.0,
+                "z": 45.0
+            }
+        },
+        {
+            "name": "Space Debris",
+            "position": {
+                "x": 2.0,
+                "y": -3.0,
+                "z": -12.0
+            },
+            "size": {
+                "x": 0.3,
+                "y": 0.3,
+                "z": 0.3
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Planet",
+            "position": {
+                "x": 10.0,
+                "y": -7.0,
+                "z": -50.0
+            },
+            "size": {
+                "x": 5.0,
+                "y": 5.0,
+                "z": 5.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
             }
         }
     ]

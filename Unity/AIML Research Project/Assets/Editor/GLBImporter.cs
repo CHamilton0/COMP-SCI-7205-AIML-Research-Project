@@ -32,6 +32,7 @@ public class GLBSceneImporter : AssetPostprocessor
         public string name;
         public Vector3 position;
         public Vector3 size;
+        public Vector3 rotation_euler_angles_degrees;
     }
 
     [System.Serializable]
@@ -99,6 +100,7 @@ public class GLBSceneImporter : AssetPostprocessor
             instance.name = objName;
             instance.transform.position = obj.position;
             instance.transform.localScale = obj.size;
+            instance.transform.rotation = Quaternion.Euler(obj.rotation_euler_angles_degrees);
 
             Debug.Log($"Placed '{objName}' at {obj.position} with size {obj.size}");
         }
