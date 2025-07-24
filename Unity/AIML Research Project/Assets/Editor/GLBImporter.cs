@@ -1,56 +1,107 @@
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.Callbacks;
 using System.IO;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
-public class GLBImportHandler : AssetPostprocessor
+public static class Slugifier
 {
-    // Path to your custom material with a vertex color shader
-    private static readonly string VertexColorMaterialPath = "Assets/Materials/VertexColor.mat";
+    public static string Slugify(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return string.Empty;
 
+        // Trim, convert to lowercase
+        text = text.Trim().ToLowerInvariant();
+
+        // Replace any non-alphanumeric or dash characters with a dash
+        text = Regex.Replace(text, @"[^a-z0-9\-]+", "-");
+
+        // Trim leading/trailing dashes
+        return text.Trim('-');
+    }
+}
+
+public class GLBSceneImporter : AssetPostprocessor
+{
+    private static readonly string VertexColorMaterialPath = "Assets/Materials/VertexColor.mat";
+    private static readonly string JSONPath = "Assets/scene.json";
+
+    [System.Serializable]
+    public class SceneObject
+    {
+        public string name;
+        public Vector3 position;
+        public Vector3 size;
+    }
+
+    [System.Serializable]
+    public class SceneData
+    {
+        public List<SceneObject> objects;
+    }
+
+    // --- AUTO: Triggered on asset import ---
     static void OnPostprocessAllAssets(
         string[] importedAssets,
         string[] deletedAssets,
         string[] movedAssets,
         string[] movedFromAssetPaths)
     {
+        bool hasGLB = false;
+
         foreach (string assetPath in importedAssets)
         {
             if (assetPath.ToLower().EndsWith(".glb"))
             {
-                AddGLBToScene(assetPath);
+                hasGLB = true;
+                Debug.Log($"GLB Imported: {assetPath}");
             }
+        }
+
+        if (hasGLB && File.Exists(JSONPath))
+        {
+            LoadAndPlaceSceneFromJSON(JSONPath);
         }
     }
 
-    private static void AddGLBToScene(string assetPath)
+    // --- MANUAL: Run from Unity menu ---
+    [MenuItem("Tools/Rebuild GLB Scene")]
+    public static void ManualRebuildScene()
     {
-        // Load the imported GLB asset
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-        if (prefab == null)
+        if (!File.Exists(JSONPath))
         {
-            Debug.LogWarning($"Failed to load GLB prefab at {assetPath}");
+            Debug.LogError("Scene JSON not found: " + JSONPath);
             return;
         }
 
-        // Instantiate in the scene
-        GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-        instance.transform.position = Vector3.zero;
+        LoadAndPlaceSceneFromJSON(JSONPath);
+    }
 
-        // Load the vertex color material
-        Material vertexMat = AssetDatabase.LoadAssetAtPath<Material>(VertexColorMaterialPath);
-        if (vertexMat != null)
+    private static void LoadAndPlaceSceneFromJSON(string path)
+    {
+        string json = File.ReadAllText(path);
+        SceneData scene = JsonUtility.FromJson<SceneData>(json);
+
+        foreach (var obj in scene.objects)
         {
-            foreach (var renderer in instance.GetComponentsInChildren<Renderer>())
+            string objName = Slugifier.Slugify(obj.name);
+
+            string glbPath = $"Assets/GLB/{objName}.glb";
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(glbPath);
+            if (prefab == null)
             {
-                renderer.sharedMaterial = vertexMat;
+                Debug.LogWarning($"No GLB prefab found for '{objName}' at {glbPath}");
+                continue;
             }
-        }
-        else
-        {
-            Debug.LogWarning($"Vertex color material not found at {VertexColorMaterialPath}");
-        }
 
-        Debug.Log($"Auto-imported and added GLB to scene: {assetPath}");
+            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            instance.name = objName;
+            instance.transform.position = obj.position;
+            instance.transform.localScale = obj.size;
+
+            Debug.Log($"Placed '{objName}' at {obj.position} with size {obj.size}");
+        }
     }
 }
