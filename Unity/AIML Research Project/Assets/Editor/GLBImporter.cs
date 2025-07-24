@@ -24,7 +24,6 @@ public static class Slugifier
 
 public class GLBSceneImporter : AssetPostprocessor
 {
-    private static readonly string VertexColorMaterialPath = "Assets/Materials/VertexColor.mat";
     private static readonly string JSONPath = "Assets/scene.json";
 
     [System.Serializable]
