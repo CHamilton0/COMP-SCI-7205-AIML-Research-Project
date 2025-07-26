@@ -83,26 +83,34 @@ public class GLBSceneImporter : AssetPostprocessor
         string json = File.ReadAllText(path);
         SceneData scene = JsonUtility.FromJson<SceneData>(json);
 
+        // Clear previous scene root
+        GameObject oldRoot = GameObject.Find("SceneRoot");
+        if (oldRoot != null)
+        {
+            Object.DestroyImmediate(oldRoot);
+        }
+
+        // Create a new root for organization
+        GameObject sceneRoot = new GameObject("SceneRoot");
+
         foreach (var obj in scene.objects)
         {
-            string objName = Slugifier.Slugify(obj.name);
-
-            string glbPath = $"Assets/GLB/{objName}.glb";
-
+            string glbPath = $"Assets/GLB/{obj.name}.glb";
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(glbPath);
             if (prefab == null)
             {
-                Debug.LogWarning($"No GLB prefab found for '{objName}' at {glbPath}");
+                Debug.LogWarning($"No GLB prefab found for '{obj.name}' at {glbPath}");
                 continue;
             }
 
             GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            instance.name = objName;
+            instance.name = obj.name;
+            instance.transform.SetParent(sceneRoot.transform);  // Parent under root
             instance.transform.position = obj.position;
             instance.transform.localScale = obj.size;
             instance.transform.rotation = Quaternion.Euler(obj.rotation_euler_angles_degrees);
 
-            Debug.Log($"Placed '{objName}' at {obj.position} with size {obj.size}");
+            Debug.Log($"Placed '{obj.name}' at {obj.position} with size {obj.size}");
         }
     }
 }
