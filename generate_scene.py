@@ -158,11 +158,16 @@ def generate_object_models(
 
 
 @app.command()
-def generate_scene(prompt: str, output_dir: Path = Path("./Unity/AIML Research Project/Assets")) -> None:
+def generate_scene(
+    prompt: str,
+    output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
+    model_batch_size: int = 1,
+    model_guidance_scale: float = 15.0,
+) -> None:
     scene = generate_scene_object(prompt)
     save_scene(scene, output_dir)
-    # generate_object_models(scene, output_dir)
-    # generate_background(scene, output_dir)
+    generate_object_models(scene, output_dir, model_batch_size, model_guidance_scale)
+    generate_background(scene, output_dir)
     print(f"Scene generation complete. Output in {output_dir}")
 
 
