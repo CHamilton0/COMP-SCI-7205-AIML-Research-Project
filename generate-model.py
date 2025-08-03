@@ -17,13 +17,7 @@ def get_objects_for_scene(scene_type: str) -> list[str]:
     )
     response = ollama.chat(model="phi3", messages=[{"role": "user", "content": prompt}])
     objects = sorted(
-        set(
-            [
-                obj.strip(" -•\t\r\n").lower()
-                for obj in response["message"]["content"].split("\n")
-                if obj.strip()
-            ]
-        )
+        set([obj.strip(" -•\t\r\n").lower() for obj in response["message"]["content"].split("\n") if obj.strip()])
     )
     return objects
 
@@ -35,13 +29,13 @@ def convert(
         help="Directory to output to.",
         default=Path("./Unity/AIML Research Project/Assets/Models"),
     ),
-):
+) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Generate a safe filename from the prompt
     def slugify(text: str) -> str:
         return re.sub(r"[^a-zA-Z0-9\-]+", "-", text.strip().lower()).strip("-")
-    
+
     objects = get_objects_for_scene(prompt)
     print(objects)
 
@@ -56,9 +50,7 @@ def convert(
     model = load_model("text300M", device=device)
     diffusion = diffusion_from_config(load_config("diffusion"))
 
-    batch_size = (
-        1  # this is the size of the models, higher values take longer to generate.
-    )
+    batch_size = 1  # this is the size of the models, higher values take longer to generate.
     guidance_scale = 15.0  # this is the scale of the guidance, higher values make the model look more like the prompt.
 
     for object in objects:

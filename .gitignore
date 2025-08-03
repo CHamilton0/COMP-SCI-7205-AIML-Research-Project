@@ -4,3 +4,5 @@ shap_e_model_cache/
 *.glb.meta
 .env
 __pycache__
+.mypy_cache
+generated_scenes_test
