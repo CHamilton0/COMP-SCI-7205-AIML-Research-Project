@@ -2,10 +2,14 @@ import json
 import re
 import subprocess
 import tempfile
+import warnings
 from pathlib import Path
 
 import typer
 from pydantic import BaseModel
+
+# Hide future warnings from shap_e
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 app = typer.Typer(add_completion=False)
 
@@ -112,7 +116,7 @@ def generate_object_models(
     print("Generating models for scene")
     for object_name in object_names:
         base_name = slugify(object_name)
-        output_file = output_dir / f"{base_name}.glb"
+        output_file = glb_dir / f"{base_name}.glb"
 
         print(f"Generating model for prompt: '{object_name}'")
         latents = sample_latents(
