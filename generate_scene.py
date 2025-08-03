@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 app = typer.Typer(add_completion=False)
 
+
 class Vector3(BaseModel):
     x: float
     y: float
@@ -26,17 +27,19 @@ class Scene(BaseModel):
     objects: list[SceneObject]
 
 
-
-
 def generate_scene_object(prompt: str) -> Scene:
     from openai import OpenAI
+
     openai_client = OpenAI()
     response = openai_client.responses.parse(
         model="gpt-4o-2024-08-06",
         input=[
             {
                 "role": "system",
-                "content": "Imagine a scene based on the prompt with some objects in the scene. Extract the scene information. Ensure the prompt for the scene skybox could generate a skybox image that could be used on a spherical shader. Add as many objects to the scene as needed, multiple copies of the same object are cheap and easy to do.",
+                "content": "Imagine a scene based on the prompt with some objects in the scene."
+                + "Extract the scene information. Ensure the prompt for the scene skybox could generate a skybox image"
+                + "that could be used on a spherical shader. Add as many objects to the scene as needed, multiple"
+                + "copies of the same object are cheap and easy to do.",
             },
             {
                 "role": "user",
@@ -61,9 +64,7 @@ def generate_background(scene: Scene) -> None:
     from diffusers import StableDiffusionPipeline
 
     # Replace the model version with your required version if needed
-    pipeline = StableDiffusionPipeline.from_pretrained(
-        "stabilityai/stable-diffusion-2", torch_dtype=torch.float16
-    )
+    pipeline = StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2", torch_dtype=torch.float16)
 
     # Running the inference on GPU with cuda enabled
     pipeline = pipeline.to("cuda")
@@ -93,7 +94,6 @@ def generate_object_models(scene: Scene) -> None:
     from shap_e.diffusion.sample import sample_latents
     from shap_e.models.download import load_config, load_model
     from shap_e.util.notebooks import decode_latent_mesh
-
 
     print("Loading models...")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -145,7 +145,7 @@ def generate_object_models(scene: Scene) -> None:
                 str(ply_file),
                 str(output_file),
             ]
-            print(f"[+] Running Blender export script...")
+            print("[+] Running Blender export script...")
             subprocess.run(command, check=True)
 
         print(f"[✓] Exported: {output_file}")
@@ -177,9 +177,7 @@ def models():
     generate_object_models(s)
 
 
-@app.command(
-    help="Generate a background image using the skybox prompt from scene.json."
-)
+@app.command(help="Generate a background image using the skybox prompt from scene.json.")
 def background():
     """Generate the skybox image only (using Stable Diffusion)."""
     import json
