@@ -1,7 +1,10 @@
-import bpy
 import sys
+from typing import Any
 
-def create_vertex_color_material(obj, mat_name="VertexColorMat"):
+import bpy
+
+
+def create_vertex_color_material(obj: Any, mat_name: str = "VertexColorMat") -> None:
     # Create a new material with vertex color node connected to base color
     mat = bpy.data.materials.new(name=mat_name)
     mat.use_nodes = True
@@ -30,9 +33,13 @@ def create_vertex_color_material(obj, mat_name="VertexColorMat"):
     else:
         obj.data.materials.append(mat)
 
-def main():
+
+def main() -> None:
     argv = sys.argv
-    argv = argv[argv.index("--") + 1:]  # get args after '--'
+
+    # get args after '--'
+    args_start_index = argv.index("--") + 1
+    argv = argv[args_start_index:]
 
     if len(argv) < 2:
         print("Usage: blender -b -P script.py -- input_file output_file")
@@ -45,10 +52,10 @@ def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
     # Import model based on file extension
-    ext = input_file.split('.')[-1].lower()
-    if ext == 'ply':
+    ext = input_file.split(".")[-1].lower()
+    if ext == "ply":
         bpy.ops.import_mesh.ply(filepath=input_file)
-    elif ext == 'obj':
+    elif ext == "obj":
         bpy.ops.import_scene.obj(filepath=input_file)
     else:
         print(f"Unsupported input format: {ext}")
@@ -56,21 +63,22 @@ def main():
 
     # Assign vertex color material to all meshes
     for obj in bpy.context.scene.objects:
-        if obj.type == 'MESH':
+        if obj.type == "MESH":
             create_vertex_color_material(obj)
 
     # Export glb with vertex colors and materials
     bpy.ops.export_scene.gltf(
         filepath=output_file,
-        export_format='GLB',
+        export_format="GLB",
         export_apply=True,
         export_texcoords=True,
         export_normals=True,
-        export_materials='EXPORT',
+        export_materials="EXPORT",
         export_colors=True,
-        export_yup=True
+        export_yup=True,
     )
     print(f"Exported {output_file} successfully.")
+
 
 if __name__ == "__main__":
     main()

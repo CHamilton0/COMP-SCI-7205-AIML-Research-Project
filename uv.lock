@@ -265,6 +265,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "accelerate" },
     { name = "diffusers" },
+    { name = "fake-bpy-module-2-80" },
     { name = "google-genai" },
     { name = "ipykernel" },
     { name = "ipywidgets" },
@@ -283,6 +284,7 @@ dependencies = [
 requires-dist = [
     { name = "accelerate", specifier = ">=1.8.1" },
     { name = "diffusers", specifier = ">=0.34.0" },
+    { name = "fake-bpy-module-2-80", specifier = ">=20250130" },
     { name = "google-genai", specifier = ">=1.25.0" },
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "ipywidgets", specifier = ">=8.1.7" },
@@ -454,6 +456,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/91/50/a9d80c47ff289c611ff12e63f7c5d13942c65d68125160cefd768c73e6e4/executing-2.2.0.tar.gz", hash = "sha256:5d108c028108fe2551d1a7b2e8b713341e2cb4fc0aa7dcf966fa4327a5226755", size = 978693 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7b/8f/c4d9bafc34ad7ad5d8dc16dd1347ee0e507a52c3adb6bfa8887e1c6a26ba/executing-2.2.0-py2.py3-none-any.whl", hash = "sha256:11387150cad388d62750327a53d3339fad4888b39a6fe233c3afbb54ecffd3aa", size = 26702 },
+]
+
+[[package]]
+name = "fake-bpy-module-2-80"
+version = "20250130"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/cc/88dc0c7a2bf13398ebf3c71379a8d01587165c30a6ade35d417b0089db70/fake_bpy_module_2_80-20250130.tar.gz", hash = "sha256:4c3171a2d11549bfe28fd813adf2a71646fd4a825f57c5d074d5781edec85eb6", size = 747906 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/52/91/08f598bb3969be47974be784d3d9af6a4f3d5670dcb8e33bad10b0df8fb8/fake_bpy_module_2.80-20250130-py3-none-any.whl", hash = "sha256:386920c3c1d4c10138adb1cae7c73438ec73ede1de27453325c71284a2d78be6", size = 848066 },
 ]
 
 [[package]]
