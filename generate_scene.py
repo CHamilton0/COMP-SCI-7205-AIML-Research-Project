@@ -35,6 +35,7 @@ class SceneObject(BaseModel):
 class Scene(BaseModel):
     stable_diffusion_scene_skybox_prompt: str
     objects: list[SceneObject]
+    camera: SceneObject
 
 
 def generate_scene_object(prompt: str) -> Scene:
@@ -48,10 +49,13 @@ def generate_scene_object(prompt: str) -> Scene:
         input=[
             {
                 "role": "system",
-                "content": "Imagine a scene based on the prompt with some objects in the scene."
-                + "Extract the scene information. Ensure the prompt for the scene skybox could generate a skybox image"
-                + "that could be used on a spherical shader. Add as many objects to the scene as needed, multiple"
-                + "copies of the same object are cheap and easy to do.",
+                "content": (
+                    "Imagine a scene based on the prompt with some objects in the scene."
+                    "Extract the scene information. Ensure the prompt for the scene skybox could generate a skybox"
+                    "image that could be used on a spherical shader. Add as many objects to the scene as needed,"
+                    "multiple copies of the same object are cheap and easy to do. Include a camera object with position"
+                    "and rotation_euler_angles_degrees to set the camera position and angle."
+                ),
             },
             {
                 "role": "user",

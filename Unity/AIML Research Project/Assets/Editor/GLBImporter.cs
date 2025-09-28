@@ -39,6 +39,7 @@ public class GLBSceneImporter : AssetPostprocessor
     public class SceneData
     {
         public List<SceneObject> objects;
+        public SceneObject camera;
     }
 
     // --- AUTO: Triggered on asset import ---
@@ -111,6 +112,14 @@ public class GLBSceneImporter : AssetPostprocessor
             instance.transform.rotation = Quaternion.Euler(obj.rotation_euler_angles_degrees);
 
             Debug.Log($"Placed '{obj.name}' at {obj.position} with size {obj.size}");
+        }
+
+        // Update the position and angle of the camera
+        Camera mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            mainCamera.transform.position = scene.camera.position;
+            mainCamera.transform.rotation = Quaternion.Euler(scene.camera.rotation_euler_angles_degrees);
         }
     }
 }
