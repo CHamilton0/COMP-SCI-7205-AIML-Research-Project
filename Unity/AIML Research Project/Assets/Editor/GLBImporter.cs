@@ -8,16 +8,9 @@ public static class Slugifier
 {
     public static string Slugify(string text)
     {
-        if (string.IsNullOrWhiteSpace(text))
-            return string.Empty;
-
-        // Trim, convert to lowercase
+        if (string.IsNullOrWhiteSpace(text)) return string.Empty;
         text = text.Trim().ToLowerInvariant();
-
-        // Replace any non-alphanumeric or dash characters with a dash
         text = Regex.Replace(text, @"[^a-z0-9\-]+", "-");
-
-        // Trim leading/trailing dashes
         return text.Trim('-');
     }
 }
@@ -42,7 +35,6 @@ public class GLBSceneImporter : AssetPostprocessor
         public SceneObject camera;
     }
 
-    // --- AUTO: Triggered on asset import ---
     static void OnPostprocessAllAssets(
         string[] importedAssets,
         string[] deletedAssets,
@@ -50,43 +42,24 @@ public class GLBSceneImporter : AssetPostprocessor
         string[] movedFromAssetPaths)
     {
         bool hasGLB = false;
-
         foreach (string assetPath in importedAssets)
-        {
-            if (assetPath.ToLower().EndsWith(".glb"))
-            {
-                hasGLB = true;
-                Debug.Log($"GLB Imported: {assetPath}");
-            }
-        }
+            if (assetPath.ToLower().EndsWith(".glb")) hasGLB = true;
 
         if (hasGLB && File.Exists(JSONPath))
-        {
-            LoadAndPlaceSceneFromJSON(JSONPath);
-        }
+            EditorApplication.delayCall += () => LoadAndPlaceSceneFromJSON(JSONPath);
     }
 
-    // --- MANUAL: Run from Unity menu ---
     [MenuItem("Tools/Rebuild GLB Scene")]
     public static void ManualRebuildScene()
     {
-        if (!File.Exists(JSONPath))
-        {
-            Debug.LogError("Scene JSON not found: " + JSONPath);
-            return;
-        }
-
+        if (!File.Exists(JSONPath)) { Debug.LogError("Scene JSON not found"); return; }
         LoadAndPlaceSceneFromJSON(JSONPath);
     }
 
-    // Clear existing objects in scene
     private static void ClearScene()
     {
         GameObject oldRoot = GameObject.Find("SceneRoot");
-        if (oldRoot != null)
-        {
-            Object.DestroyImmediate(oldRoot);
-        }
+        if (oldRoot != null) Object.DestroyImmediate(oldRoot);
     }
 
     private static void LoadAndPlaceSceneFromJSON(string path)
@@ -96,32 +69,39 @@ public class GLBSceneImporter : AssetPostprocessor
 
         ClearScene();
 
-        // Create a new root for organization
         GameObject sceneRoot = new GameObject("SceneRoot");
 
         foreach (var obj in scene.objects)
         {
             string glbPath = $"Assets/GLB/{Slugifier.Slugify(obj.name)}.glb";
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(glbPath);
-            if (prefab == null)
-            {
-                Debug.LogWarning($"No GLB prefab found for '{obj.name}' at {glbPath}");
-                continue;
-            }
+            if (prefab == null) continue;
 
-            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, sceneRoot.transform);
             instance.name = obj.name;
-            instance.transform.SetParent(sceneRoot.transform);  // Parent under root
-            instance.transform.position = obj.position;
-            instance.transform.localScale = obj.size;
-            instance.transform.rotation = Quaternion.Euler(obj.rotation_euler_angles_degrees);
 
-            Debug.Log($"Placed '{obj.name}' at {obj.position} with size {obj.size}");
+            // Apply rotation/scale first
+            instance.transform.rotation = Quaternion.Euler(obj.rotation_euler_angles_degrees);
+            instance.transform.localScale = obj.size;
+
+            // Compute renderer bounds offset so visual center matches JSON position
+            Renderer[] rends = instance.GetComponentsInChildren<Renderer>();
+            if (rends.Length > 0)
+            {
+                Bounds b = rends[0].bounds;
+                for (int i = 1; i < rends.Length; i++) b.Encapsulate(rends[i].bounds);
+                Vector3 offset = b.center - instance.transform.position;
+                instance.transform.position = obj.position - offset;
+            }
+            else
+            {
+                instance.transform.position = obj.position;
+            }
         }
 
-        // Update the position and angle of the camera
+        // Camera
         Camera mainCamera = Camera.main;
-        if (mainCamera != null)
+        if (mainCamera != null && scene.camera != null)
         {
             mainCamera.transform.position = scene.camera.position;
             mainCamera.transform.rotation = Quaternion.Euler(scene.camera.rotation_euler_angles_degrees);

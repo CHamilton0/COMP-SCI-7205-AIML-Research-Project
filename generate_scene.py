@@ -54,7 +54,8 @@ def generate_scene_object(prompt: str) -> Scene:
                     "Extract the scene information. Ensure the prompt for the scene skybox could generate a skybox"
                     "image that could be used on a spherical shader. Add as many objects to the scene as needed,"
                     "multiple copies of the same object are cheap and easy to do. Include a camera object with position"
-                    "and rotation_euler_angles_degrees to set the camera position and angle."
+                    "and rotation_euler_angles_degrees to set the camera position and angle so that it captures the"
+                    "objects in the scene."
                 ),
             },
             {
