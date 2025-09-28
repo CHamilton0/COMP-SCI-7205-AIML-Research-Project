@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "accelerate>=1.8.1",
+    "blender>=1.4",
     "diffusers>=0.34.0",
     "fake-bpy-module-2-80>=20250130",
     "google-genai>=1.25.0",

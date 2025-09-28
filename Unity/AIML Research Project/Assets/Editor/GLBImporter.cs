@@ -79,24 +79,29 @@ public class GLBSceneImporter : AssetPostprocessor
         LoadAndPlaceSceneFromJSON(JSONPath);
     }
 
-    private static void LoadAndPlaceSceneFromJSON(string path)
+    // Clear existing objects in scene
+    private static void ClearScene()
     {
-        string json = File.ReadAllText(path);
-        SceneData scene = JsonUtility.FromJson<SceneData>(json);
-
-        // Clear previous scene root
         GameObject oldRoot = GameObject.Find("SceneRoot");
         if (oldRoot != null)
         {
             Object.DestroyImmediate(oldRoot);
         }
+    }
+
+    private static void LoadAndPlaceSceneFromJSON(string path)
+    {
+        string json = File.ReadAllText(path);
+        SceneData scene = JsonUtility.FromJson<SceneData>(json);
+
+        ClearScene();
 
         // Create a new root for organization
         GameObject sceneRoot = new GameObject("SceneRoot");
 
         foreach (var obj in scene.objects)
         {
-            string glbPath = $"Assets/GLB/{obj.name}.glb";
+            string glbPath = $"Assets/GLB/{Slugifier.Slugify(obj.name)}.glb";
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(glbPath);
             if (prefab == null)
             {

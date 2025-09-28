@@ -1,102 +1,30 @@
 {
-    "stable_diffusion_scene_skybox_prompt": "A vast expanse of deep space, filled with distant stars and nebulae glowing in vibrant colors. The scene is dominated by a large spiral galaxy swirling in the distance, with a few bright planets visible against a backdrop of countless twinkling stars.",
+    "stable_diffusion_scene_skybox_prompt": "A vast and starry space skybox with distant galaxies, nebulae, and shimmering stars.",
     "objects": [
         {
-            "name": "Spacecraft",
+            "name": "Planet",
             "position": {
-                "x": 0.0,
+                "x": 50.0,
                 "y": 0.0,
-                "z": -10.0
+                "z": 100.0
             },
             "size": {
-                "x": 2.0,
-                "y": 1.0,
-                "z": 4.0
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 0.0,
-                "y": 45.0,
-                "z": 0.0
-            }
-        },
-        {
-            "name": "Asteroid",
-            "position": {
-                "x": 5.0,
-                "y": 3.0,
-                "z": -15.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "rotation_euler_angles_degrees": {
                 "x": 20.0,
-                "y": 10.0,
-                "z": 0.0
-            }
-        },
-        {
-            "name": "Asteroid",
-            "position": {
-                "x": -3.0,
-                "y": -2.0,
-                "z": -5.0
-            },
-            "size": {
-                "x": 1.5,
-                "y": 1.5,
-                "z": 1.5
+                "y": 20.0,
+                "z": 20.0
             },
             "rotation_euler_angles_degrees": {
                 "x": 0.0,
                 "y": 30.0,
-                "z": 10.0
-            }
-        },
-        {
-            "name": "Satellite",
-            "position": {
-                "x": -4.0,
-                "y": 1.0,
-                "z": -8.0
-            },
-            "size": {
-                "x": 0.5,
-                "y": 0.5,
-                "z": 1.0
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 15.0,
-                "y": 0.0,
-                "z": 45.0
-            }
-        },
-        {
-            "name": "Space Debris",
-            "position": {
-                "x": 2.0,
-                "y": -3.0,
-                "z": -12.0
-            },
-            "size": {
-                "x": 0.3,
-                "y": 0.3,
-                "z": 0.3
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 0.0,
-                "y": 0.0,
                 "z": 0.0
             }
         },
         {
-            "name": "Planet",
+            "name": "Asteroid",
             "position": {
-                "x": 10.0,
-                "y": -7.0,
-                "z": -50.0
+                "x": -40.0,
+                "y": 10.0,
+                "z": 60.0
             },
             "size": {
                 "x": 5.0,
@@ -104,10 +32,136 @@
                 "z": 5.0
             },
             "rotation_euler_angles_degrees": {
+                "x": 10.0,
+                "y": 15.0,
+                "z": 5.0
+            }
+        },
+        {
+            "name": "Asteroid",
+            "position": {
+                "x": -45.0,
+                "y": 12.0,
+                "z": 65.0
+            },
+            "size": {
+                "x": 6.0,
+                "y": 6.0,
+                "z": 6.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 20.0,
+                "y": 25.0,
+                "z": 15.0
+            }
+        },
+        {
+            "name": "Satellite",
+            "position": {
+                "x": 30.0,
+                "y": -20.0,
+                "z": 80.0
+            },
+            "size": {
+                "x": 8.0,
+                "y": 3.0,
+                "z": 3.0
+            },
+            "rotation_euler_angles_degrees": {
                 "x": 0.0,
+                "y": 60.0,
+                "z": 10.0
+            }
+        },
+        {
+            "name": "Alien Ship",
+            "position": {
+                "x": 0.0,
+                "y": 30.0,
+                "z": 150.0
+            },
+            "size": {
+                "x": 10.0,
+                "y": 10.0,
+                "z": 5.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 90.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Space Debris",
+            "position": {
+                "x": -10.0,
+                "y": -10.0,
+                "z": 70.0
+            },
+            "size": {
+                "x": 3.0,
+                "y": 3.0,
+                "z": 3.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 5.0,
+                "y": 15.0,
+                "z": 35.0
+            }
+        },
+        {
+            "name": "Space Debris",
+            "position": {
+                "x": 5.0,
                 "y": 0.0,
+                "z": 75.0
+            },
+            "size": {
+                "x": 2.0,
+                "y": 2.0,
+                "z": 2.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 10.0,
+                "y": 25.0,
+                "z": 40.0
+            }
+        },
+        {
+            "name": "Space Station",
+            "position": {
+                "x": -60.0,
+                "y": 20.0,
+                "z": 200.0
+            },
+            "size": {
+                "x": 30.0,
+                "y": 15.0,
+                "z": 15.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 60.0,
                 "z": 0.0
             }
         }
-    ]
+    ],
+    "camera": {
+        "name": "Main Camera",
+        "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -50.0
+        },
+        "size": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+        },
+        "rotation_euler_angles_degrees": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+        }
+    }
 }
