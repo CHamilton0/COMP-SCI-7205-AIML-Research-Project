@@ -1,17 +1,17 @@
 {
-    "stable_diffusion_scene_skybox_prompt": "A vast, dark outer space with scattered stars and distant galaxies. A nebula with vibrant purple and blue hues adds contrast to the dark void.",
+    "stable_diffusion_scene_skybox_prompt": "A breathtaking view of deep space with swirling galaxies, glowing nebulae, and countless stars, all set against a dark, expansive void. The cosmic colors include shades of purple, blue, and hints of bright white light.",
     "objects": [
         {
-            "name": "Asteroid 1",
+            "name": "Spaceship",
             "position": {
-                "x": 5.0,
-                "y": 1.0,
-                "z": 15.0
+                "x": 10.0,
+                "y": 5.0,
+                "z": 20.0
             },
             "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
+                "x": 3.0,
+                "y": 3.0,
+                "z": 8.0
             },
             "rotation_euler_angles_degrees": {
                 "x": 0.0,
@@ -20,120 +20,84 @@
             }
         },
         {
-            "name": "Asteroid 2",
+            "name": "Spaceship",
             "position": {
-                "x": -3.0,
-                "y": -2.0,
-                "z": 12.0
+                "x": -15.0,
+                "y": 3.0,
+                "z": 25.0
             },
             "size": {
-                "x": 0.8,
-                "y": 0.8,
-                "z": 0.8
+                "x": 3.0,
+                "y": 3.0,
+                "z": 8.0
             },
             "rotation_euler_angles_degrees": {
                 "x": 0.0,
-                "y": 30.0,
-                "z": 10.0
+                "y": -30.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Asteroid",
+            "position": {
+                "x": 5.0,
+                "y": 10.0,
+                "z": 15.0
+            },
+            "size": {
+                "x": 5.0,
+                "y": 5.0,
+                "z": 5.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Asteroid",
+            "position": {
+                "x": -8.0,
+                "y": -2.0,
+                "z": 18.0
+            },
+            "size": {
+                "x": 5.0,
+                "y": 5.0,
+                "z": 5.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
             }
         },
         {
             "name": "Satellite",
             "position": {
-                "x": 2.0,
-                "y": 0.5,
-                "z": 8.0
-            },
-            "size": {
-                "x": 0.5,
-                "y": 0.5,
-                "z": 0.5
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 90.0
-            }
-        },
-        {
-            "name": "Space Debris 1",
-            "position": {
-                "x": -1.0,
-                "y": 1.0,
-                "z": 7.0
-            },
-            "size": {
-                "x": 0.2,
-                "y": 0.2,
-                "z": 0.2
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 10.0,
-                "y": 20.0,
-                "z": 30.0
-            }
-        },
-        {
-            "name": "Space Debris 2",
-            "position": {
-                "x": 0.5,
-                "y": -0.5,
-                "z": 9.0
-            },
-            "size": {
-                "x": 0.15,
-                "y": 0.15,
-                "z": 0.15
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 15.0,
-                "y": 25.0,
-                "z": 5.0
-            }
-        },
-        {
-            "name": "Large Asteroid",
-            "position": {
-                "x": -6.0,
-                "y": 3.0,
-                "z": 20.0
-            },
-            "size": {
-                "x": 3.0,
-                "y": 3.0,
-                "z": 3.0
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 0.0,
-                "y": 60.0,
-                "z": 0.0
-            }
-        },
-        {
-            "name": "Comet",
-            "position": {
-                "x": 4.0,
-                "y": -3.0,
-                "z": 18.0
+                "x": 12.0,
+                "y": -5.0,
+                "z": 22.0
             },
             "size": {
                 "x": 2.0,
-                "y": 0.5,
-                "z": 0.5
+                "y": 2.0,
+                "z": 4.0
             },
             "rotation_euler_angles_degrees": {
                 "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
+                "y": 15.0,
+                "z": 25.0
             }
         }
     ],
     "camera": {
-        "name": "Main Camera",
+        "name": "Camera",
         "position": {
             "x": 0.0,
             "y": 0.0,
-            "z": 5.0
+            "z": 10.0
         },
         "size": {
             "x": 0.0,

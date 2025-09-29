@@ -62,6 +62,61 @@ public class GLBSceneImporter : AssetPostprocessor
         if (oldRoot != null) Object.DestroyImmediate(oldRoot);
     }
 
+    static Bounds GetBounds(GameObject go)
+    {
+        var renderers = go.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0) return new Bounds(go.transform.position, Vector3.zero);
+
+        Bounds bounds = renderers[0].bounds;
+        foreach (var r in renderers)
+        {
+            bounds.Encapsulate(r.bounds);
+        }
+        return bounds;
+    }
+
+    static float CalculateCameraDistance(Bounds bounds, Camera cam)
+    {
+        float fovVertical = cam.fieldOfView * Mathf.Deg2Rad;
+        float aspect = cam.aspect;
+
+        // size of the bounds in world space
+        float height = bounds.size.y;
+        float width = bounds.size.x;
+
+        // half angles
+        float halfFovV = fovVertical / 2f;
+        float halfFovH = Mathf.Atan(Mathf.Tan(halfFovV) * aspect);
+
+        // Required distances for vertical and horizontal fit:
+        float distV = (height / 2f) / Mathf.Tan(halfFovV);
+        float distH = (width / 2f) / Mathf.Tan(halfFovH);
+
+        // use the larger one to ensure it fits both horizontally and vertically
+        return Mathf.Max(distV, distH);
+    }
+
+    public static void FrameObject(Camera cam, GameObject target, Vector3 viewDirection)
+    {
+        Bounds bounds = GetBounds(target);
+        Vector3 center = bounds.center;
+
+        float distance = CalculateCameraDistance(bounds, cam);
+
+        // Make sure viewDirection is normalized
+        Vector3 dir = viewDirection.normalized;
+
+        // Position camera:
+        cam.transform.position = center - dir * distance;
+
+        // Look at center with a chosen up vector (usually Vector3.up):
+        cam.transform.rotation = Quaternion.LookRotation(dir, Vector3.up);
+
+        // Optional: adjust near/far planes if needed
+        cam.nearClipPlane = distance * 0.1f;
+        cam.farClipPlane = distance * 4f;
+    }
+
     private static void LoadAndPlaceSceneFromJSON(string path)
     {
         string json = File.ReadAllText(path);
@@ -105,6 +160,10 @@ public class GLBSceneImporter : AssetPostprocessor
         {
             mainCamera.transform.position = scene.camera.position;
             mainCamera.transform.rotation = Quaternion.Euler(scene.camera.rotation_euler_angles_degrees);
+            mainCamera.fieldOfView = 60f;
         }
+
+        FrameObject(mainCamera, sceneRoot, mainCamera.transform.forward);
+        CameraUtils.TakeScreenshot(Application.dataPath + "/shot.png", 1920, 1080);
     }
 }
