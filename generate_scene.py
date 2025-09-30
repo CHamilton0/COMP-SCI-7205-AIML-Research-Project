@@ -1,3 +1,4 @@
+import base64
 import json
 import logging
 import re
@@ -206,6 +207,51 @@ def generate_object_models(
         logger.debug(f"Successfully generated model file: {output_file}")
 
     logger.debug("All object models generated successfully")
+
+
+class SceneImageAnalysisResult(BaseModel):
+    objects: list[str]
+
+
+def analyse_scene_image(image_path: Path) -> SceneImageAnalysisResult:
+    logger.debug(f"get_objects_in_scene called with image_path: {image_path}")
+    from openai import OpenAI
+
+    def encode_image(image_path: Path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode("utf-8")
+
+    openai_client = OpenAI()
+    logger.debug("Generating object list with LLM")
+    response = openai_client.responses.parse(
+        model="gpt-4.1",
+        input=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": "What objects are in this image?"},
+                    {
+                        "type": "input_image",
+                        "image_url": f"data:image/png;base64,{encode_image(image_path)}",
+                    },
+                ],
+            },
+        ],
+        text_format=SceneImageAnalysisResult,
+    )
+
+    objects_in_scene: SceneImageAnalysisResult = response.output_parsed
+
+    return objects_in_scene
+
+
+@app.command()
+def analyse_scene(
+    image_path: Path = Path("./Unity/AIML Research Project/Assets/shot.png"),
+) -> None:
+    logger.debug(f"get_objects command called with image_path: {image_path}")
+    scene_analysis = analyse_scene_image(image_path)
+    logger.debug(f"Objects extracted from image, {scene_analysis.objects}")
 
 
 @app.command()
