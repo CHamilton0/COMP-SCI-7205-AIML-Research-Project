@@ -11,7 +11,7 @@ import typer
 from pydantic import BaseModel
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Hide future warnings from shap_e
@@ -211,10 +211,15 @@ def generate_object_models(
 
 class SceneImageAnalysisResult(BaseModel):
     objects: list[str]
+    first_image_better_scene: bool
 
 
-def analyse_scene_image(image_path: Path) -> SceneImageAnalysisResult:
-    logger.debug(f"get_objects_in_scene called with image_path: {image_path}")
+def analyse_scene_images(
+    image_path1: Path,
+    image_path2: Path,
+    scene_prompt: str,
+) -> SceneImageAnalysisResult:
+    logger.debug(f"get_objects_in_scene called with image_paths: {image_path1} and {image_path2}")
     from openai import OpenAI
 
     def encode_image(image_path: Path):
@@ -229,10 +234,20 @@ def analyse_scene_image(image_path: Path) -> SceneImageAnalysisResult:
             {
                 "role": "user",
                 "content": [
-                    {"type": "input_text", "text": "What objects are in this image?"},
+                    {
+                        "type": "input_text",
+                        "text": (
+                            "Which of the two following images better represent the scene described by the"
+                            f"following prompt? {scene_prompt}"
+                        ),
+                    },
                     {
                         "type": "input_image",
-                        "image_url": f"data:image/png;base64,{encode_image(image_path)}",
+                        "image_url": f"data:image/png;base64,{encode_image(image_path1)}",
+                    },
+                    {
+                        "type": "input_image",
+                        "image_url": f"data:image/png;base64,{encode_image(image_path2)}",
                     },
                 ],
             },
@@ -240,18 +255,22 @@ def analyse_scene_image(image_path: Path) -> SceneImageAnalysisResult:
         text_format=SceneImageAnalysisResult,
     )
 
-    objects_in_scene: SceneImageAnalysisResult = response.output_parsed
+    result: SceneImageAnalysisResult = response.output_parsed
 
-    return objects_in_scene
+    return result
 
 
 @app.command()
 def analyse_scene(
-    image_path: Path = Path("./Unity/AIML Research Project/Assets/shot.png"),
+    scene_prompt: str,
+    image_path1: Path = Path("./Unity/AIML Research Project/Assets/boat.png"),
+    image_path2: Path = Path("./Unity/AIML Research Project/Assets/shot1.png"),
 ) -> None:
-    logger.debug(f"get_objects command called with image_path: {image_path}")
-    scene_analysis = analyse_scene_image(image_path)
-    logger.debug(f"Objects extracted from image, {scene_analysis.objects}")
+    logger.debug(f"get_objects command called with image_path: {image_path1} and {image_path2}")
+    scene_analysis = analyse_scene_images(image_path1, image_path2, scene_prompt)
+    logger.info(
+        f"The better scene was {scene_analysis.first_image_better_scene == True and image_path1 or image_path2}"
+    )
 
 
 @app.command()
