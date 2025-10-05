@@ -1,14 +1,17 @@
-using UnityEngine;
-using UnityEditor;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using static Codice.Client.Commands.WkTree.WorkspaceTreeNode;
 
-public class GLBSceneImporter : AssetPostprocessor
+public class GenerateMultipleScenes
 {
-    private static readonly string JSONPath = "Assets/scene.json";
+    private static readonly string ScenesDirectory = "Assets/generated-scenes";
 
     [System.Serializable]
-    public class SceneObject
+    public class JSONSceneObject
     {
         public string name;
         public Vector3 position;
@@ -17,37 +20,36 @@ public class GLBSceneImporter : AssetPostprocessor
     }
 
     [System.Serializable]
-    public class SceneData
+    public class JSONSceneData
     {
-        public List<SceneObject> objects;
-        public SceneObject camera;
+        public List<JSONSceneObject> objects;
+        public JSONSceneObject camera;
     }
 
-    //static void OnPostprocessAllAssets(
-    //    string[] importedAssets,
-    //    string[] deletedAssets,
-    //    string[] movedAssets,
-    //    string[] movedFromAssetPaths)
-    //{
-    //    bool hasGLB = false;
-    //    foreach (string assetPath in importedAssets)
-    //        if (assetPath.ToLower().EndsWith(".glb")) hasGLB = true;
-
-    //    if (hasGLB && File.Exists(JSONPath))
-    //        EditorApplication.delayCall += () => LoadAndPlaceSceneFromJSON(JSONPath);
-    //}
-
-    [MenuItem("Tools/Rebuild GLB Scene")]
-    public static void ManualRebuildScene()
+    [MenuItem("Tools/Generate Scenes")]
+    public static void GenerateScenes()
     {
-        if (!File.Exists(JSONPath)) { Debug.LogError("Scene JSON not found"); return; }
-        LoadAndPlaceSceneFromJSON(JSONPath);
-    }
+        // Loop through the scene directories and process each scene.json
+        if (!Directory.Exists(ScenesDirectory))
+        {
+            Debug.LogError($"Scenes directory not found: {ScenesDirectory}");
+            return;
+        }
 
-    private static void ClearScene()
-    {
-        GameObject oldRoot = GameObject.Find("SceneRoot");
-        if (oldRoot != null) Object.DestroyImmediate(oldRoot);
+        string[] sceneDirs = Directory.GetDirectories(ScenesDirectory);
+        foreach (string dir in sceneDirs)
+        {
+            LoadAndPlaceScene(dir);
+            string jsonPath = Path.Combine(dir, "scene.json");
+            if (File.Exists(jsonPath))
+            {
+                Debug.Log($"Processing scene: {dir}");
+            }
+            else
+            {
+                Debug.LogWarning($"No scene.json found in {dir}");
+            }
+        }
     }
 
     static Bounds GetBounds(GameObject go)
@@ -105,22 +107,26 @@ public class GLBSceneImporter : AssetPostprocessor
         cam.farClipPlane = distance * 4f;
     }
 
-    private static void LoadAndPlaceSceneFromJSON(string path)
+    private static Scene LoadAndPlaceSceneFromJSON(string dirPath)
     {
-        string json = File.ReadAllText(path);
-        SceneData scene = JsonUtility.FromJson<SceneData>(json);
+        string jsonPath = Path.Combine(dirPath, "scene.json");
 
-        ClearScene();
+        string json = File.ReadAllText(jsonPath);
+        JSONSceneData sceneData = JsonUtility.FromJson<JSONSceneData>(json);
 
-        GameObject sceneRoot = new GameObject("SceneRoot");
-
-        foreach (var obj in scene.objects)
+        foreach (var obj in sceneData.objects)
         {
-            string glbPath = $"Assets/GLB/{Slugifier.Slugify(obj.name)}.glb";
+            string glbPath = $"{dirPath}/GLB/{Slugifier.Slugify(obj.name)}.glb";
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(glbPath);
-            if (prefab == null) continue;
+            if (prefab == null)
+            {
+                Debug.LogWarning($"Prefab not found at path: {glbPath}");
+                continue;
+            }
 
-            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, sceneRoot.transform);
+
+            Scene targetScene = SceneManager.GetActiveScene();
+            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, targetScene);
             instance.name = obj.name;
 
             // Apply rotation/scale first
@@ -142,16 +148,31 @@ public class GLBSceneImporter : AssetPostprocessor
             }
         }
 
-        // Camera
+        GameObject newCameraGameObject = new GameObject("Main Camera");
+        newCameraGameObject.AddComponent<Camera>();
+
         Camera mainCamera = Camera.main;
-        if (mainCamera != null && scene.camera != null)
+        if (mainCamera != null && sceneData.camera != null)
         {
-            mainCamera.transform.position = scene.camera.position;
-            mainCamera.transform.rotation = Quaternion.Euler(scene.camera.rotation_euler_angles_degrees);
+            mainCamera.transform.position = sceneData.camera.position;
+            mainCamera.transform.rotation = Quaternion.Euler(sceneData.camera.rotation_euler_angles_degrees);
             mainCamera.fieldOfView = 60f;
         }
 
-        FrameObject(mainCamera, sceneRoot, mainCamera.transform.forward);
-        CameraUtils.TakeScreenshot(Application.dataPath + "/shot.png", 1920, 1080);
+        return SceneManager.GetActiveScene();
+    }
+
+    private static void LoadAndPlaceScene(string dir)
+    {
+        // Create a new empty scene in this directory
+        Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+        // Load the new scene in the editor
+        EditorSceneManager.SaveScene(newScene, Path.Combine(dir, "Scene.unity"));
+        EditorSceneManager.OpenScene(Path.Combine(dir, "Scene.unity"));
+
+        Scene resultScene = LoadAndPlaceSceneFromJSON(dir);
+
+        EditorSceneManager.SaveScene(resultScene, Path.Combine(dir, "Scene.unity"));
     }
 }
