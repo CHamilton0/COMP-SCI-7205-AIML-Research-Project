@@ -23,7 +23,7 @@ public class AutoSkyboxProcessor : AssetPostprocessor
         }
     }
 
-    private static void ApplySkyboxFromPNG(string pngAssetPath)
+    public static void ApplySkyboxFromPNG(string pngAssetPath)
     {
         // Adjust texture import settings
         TextureImporter importer = AssetImporter.GetAtPath(pngAssetPath) as TextureImporter;
@@ -63,5 +63,31 @@ public class AutoSkyboxProcessor : AssetPostprocessor
         DynamicGI.UpdateEnvironment();
 
         Debug.Log($"Skybox updated from PNG: {pngAssetPath}");
+    }
+
+    public static void ApplySkyboxToMaterial(Material skyboxMat, string pngAssetPath)
+    {
+        if (skyboxMat == null)
+        {
+            Debug.LogError("Skybox material is null.");
+            return;
+        }
+        // Load texture
+        Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(pngAssetPath);
+        if (tex == null)
+        {
+            Debug.LogError("Failed to load texture: " + pngAssetPath);
+            return;
+        }
+        skyboxMat.shader = Shader.Find("Skybox/Panoramic");
+        skyboxMat.SetTexture("_MainTex", tex);
+        skyboxMat.SetFloat("_Mapping", 1);    // Latitude-Longitude layout
+        skyboxMat.SetFloat("_ImageType", 0);  // 2D texture
+        EditorUtility.SetDirty(skyboxMat);
+        AssetDatabase.SaveAssets();
+        
+        RenderSettings.skybox = skyboxMat;
+        DynamicGI.UpdateEnvironment();
+        Debug.Log($"Skybox material updated from PNG: {pngAssetPath}");
     }
 }

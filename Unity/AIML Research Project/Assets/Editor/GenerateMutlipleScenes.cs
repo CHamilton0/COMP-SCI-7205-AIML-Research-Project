@@ -173,6 +173,12 @@ public class GenerateMultipleScenes
 
         Scene resultScene = LoadAndPlaceSceneFromJSON(dir);
 
+        // Create a skybox material for this scene in the directory
+        Material skyboxMat = new Material(Shader.Find("Skybox/Panoramic"));
+        string skyboxMatPath = Path.Combine(dir, "Skybox.mat");
+        AssetDatabase.CreateAsset(skyboxMat, skyboxMatPath);
+        AutoSkyboxProcessor.ApplySkyboxToMaterial(skyboxMat, Path.Combine(dir, "background.png"));
+
         EditorSceneManager.SaveScene(resultScene, Path.Combine(dir, "Scene.unity"));
     }
 }
