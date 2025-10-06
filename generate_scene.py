@@ -210,7 +210,8 @@ def generate_object_models(
 
 
 class SceneImageAnalysisResult(BaseModel):
-    objects: list[str]
+    objects_in_first_image: list[str]
+    objects_in_second_image: list[str]
     first_image_better_scene: bool
 
 
@@ -261,16 +262,45 @@ def analyse_scene_images(
 
 
 @app.command()
-def analyse_scene(
+def get_best_scene(
     scene_prompt: str,
-    image_path1: Path = Path("./Unity/AIML Research Project/Assets/boat.png"),
-    image_path2: Path = Path("./Unity/AIML Research Project/Assets/shot1.png"),
+    generated_scenes_directory: Path = Path("./Unity/AIML Research Project/Assets/generated-scenes"),
 ) -> None:
-    logger.debug(f"get_objects command called with image_path: {image_path1} and {image_path2}")
-    scene_analysis = analyse_scene_images(image_path1, image_path2, scene_prompt)
-    logger.info(
-        f"The better scene was {scene_analysis.first_image_better_scene == True and image_path1 or image_path2}"
-    )
+    logger.debug(f"get_best_scene command called with generated_scenes_directory: {generated_scenes_directory}")
+    scene_directories = sorted(
+        [d for d in generated_scenes_directory.iterdir() if d.is_dir()],
+        key=lambda d: d.stat().st_mtime,
+        reverse=True,
+    )[:2]
+
+    if not scene_directories or len(scene_directories) < 2:
+        logger.error("Not enough scene directories found.")
+        return
+
+    # Create pairs of images to compare until only one best scene remains
+    while len(scene_directories) > 1:
+        dir1 = scene_directories.pop()
+        dir2 = scene_directories.pop()
+
+        image1 = dir1 / "screenshot.png"
+        image2 = dir2 / "screenshot.png"
+
+        if not image1.exists() or not image2.exists():
+            logger.warning(f"One of the images does not exist: {image1}, {image2}")
+            continue
+
+        logger.debug(f"Comparing images: {image1} and {image2}")
+        analysis_result = analyse_scene_images(image1, image2, scene_prompt)
+
+        if analysis_result.first_image_better_scene:
+            scene_directories.append(dir1)  # Keep the better scene for further comparison
+            logger.info(f"Selected better scene: {dir1}")
+        else:
+            scene_directories.append(dir2)  # Keep the better scene for further comparison
+            logger.info(f"Selected better scene: {dir2}")
+
+    if scene_directories:
+        logger.info(f"Best scene found: {scene_directories[0]}")
 
 
 @app.command()

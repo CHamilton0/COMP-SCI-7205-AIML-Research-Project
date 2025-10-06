@@ -114,6 +114,9 @@ public class GenerateMultipleScenes
         string json = File.ReadAllText(jsonPath);
         JSONSceneData sceneData = JsonUtility.FromJson<JSONSceneData>(json);
 
+        Scene targetScene = SceneManager.GetActiveScene();
+        GameObject sceneRoot = new GameObject("SceneRoot");
+
         foreach (var obj in sceneData.objects)
         {
             string glbPath = $"{dirPath}/GLB/{Slugifier.Slugify(obj.name)}.glb";
@@ -124,9 +127,7 @@ public class GenerateMultipleScenes
                 continue;
             }
 
-
-            Scene targetScene = SceneManager.GetActiveScene();
-            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, targetScene);
+            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, sceneRoot.transform);
             instance.name = obj.name;
 
             // Apply rotation/scale first
@@ -149,15 +150,23 @@ public class GenerateMultipleScenes
         }
 
         GameObject newCameraGameObject = new GameObject("Main Camera");
-        newCameraGameObject.AddComponent<Camera>();
+        newCameraGameObject.tag = "MainCamera";
+        Camera camera = newCameraGameObject.AddComponent<Camera>();
 
-        Camera mainCamera = Camera.main;
-        if (mainCamera != null && sceneData.camera != null)
+        if (camera != null && sceneData.camera != null)
         {
-            mainCamera.transform.position = sceneData.camera.position;
-            mainCamera.transform.rotation = Quaternion.Euler(sceneData.camera.rotation_euler_angles_degrees);
-            mainCamera.fieldOfView = 60f;
+            camera.transform.position = sceneData.camera.position;
+            camera.transform.rotation = Quaternion.Euler(sceneData.camera.rotation_euler_angles_degrees);
+            camera.fieldOfView = 60f;
         }
+
+        // Create lighting for the scene
+        GameObject lightGameObject = new GameObject("Directional Light");
+        Light lightComp = lightGameObject.AddComponent<Light>();
+        lightComp.type = LightType.Directional;
+        lightComp.intensity = 1f;
+        lightGameObject.transform.rotation = Quaternion.Euler(50f, -30f, 0f);
+        lightGameObject.transform.parent = sceneRoot.transform;
 
         return SceneManager.GetActiveScene();
     }
@@ -172,6 +181,9 @@ public class GenerateMultipleScenes
         EditorSceneManager.OpenScene(Path.Combine(dir, "Scene.unity"));
 
         Scene resultScene = LoadAndPlaceSceneFromJSON(dir);
+        Camera camera = Camera.main;
+
+        FrameObject(camera, GameObject.Find("SceneRoot"), camera.transform.forward);
 
         // Create a skybox material for this scene in the directory
         Material skyboxMat = new Material(Shader.Find("Skybox/Panoramic"));
@@ -180,5 +192,7 @@ public class GenerateMultipleScenes
         AutoSkyboxProcessor.ApplySkyboxToMaterial(skyboxMat, Path.Combine(dir, "background.png"));
 
         EditorSceneManager.SaveScene(resultScene, Path.Combine(dir, "Scene.unity"));
+
+        CameraUtils.TakeScreenshot(Path.Combine(dir, "screenshot.png"), 1920, 1080);
     }
 }

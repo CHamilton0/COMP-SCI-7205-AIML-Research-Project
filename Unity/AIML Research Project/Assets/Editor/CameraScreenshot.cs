@@ -1,10 +1,13 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using System.Collections;
+using UnityEditor;
 
 public class CameraUtils : MonoBehaviour
 {
     public static void TakeScreenshot(string filePath, int width, int height)
     {
-        Camera cam = Camera.main; // <<-- main camera again
+        Camera cam = Camera.main;
         if (cam == null) { Debug.LogError("No MainCamera found!"); return; }
 
         RenderTexture rt = new RenderTexture(width, height, 24);
@@ -18,7 +21,7 @@ public class CameraUtils : MonoBehaviour
 
         cam.targetTexture = null;
         RenderTexture.active = null;
-        Destroy(rt);
+        DestroyImmediate(rt);
 
         byte[] bytes = screenShot.EncodeToPNG();
         System.IO.File.WriteAllBytes(filePath, bytes);
