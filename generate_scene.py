@@ -51,7 +51,7 @@ def generate_scene_object(prompt: str) -> Scene:
             {
                 "role": "system",
                 "content": (
-                    "Imagine a scene based on the prompt with lots of objects in the scene."
+                    "Imagine a scene based on the prompt with some objects in the scene."
                     "Extract the scene information. Ensure the prompt for the scene skybox could generate a skybox"
                     "image that could be used on a spherical shader. Add as many objects to the scene as needed,"
                     "multiple copies of the same object are cheap and easy to do. Include a camera object with position"
@@ -88,25 +88,20 @@ def save_scene(scene: Scene, output_dir: Path = Path("./Unity/AIML Research Proj
 
 def generate_background(scene: Scene, output_dir: Path = Path("./Unity/AIML Research Project/Assets")) -> None:
     logger.debug(f"generate_background called with output_dir: {output_dir}")
-    from openai import OpenAI
-    from PIL import Image
-    import io
+    import torch
+    from diffusers import StableDiffusionPipeline
+
+    logger.debug("Loading Stable Diffusion pipeline")
+    pipeline = StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2", torch_dtype=torch.float16)
+
+    pipeline = pipeline.to("cuda")
+    logger.debug("Pipeline loaded and moved to CUDA")
 
     prompt = scene.stable_diffusion_scene_skybox_prompt
     logger.debug(f"Generating background with prompt: {prompt}")
 
-    openai_client = OpenAI()
-    logger.debug("Requesting image from OpenAI API")
-    response = openai_client.images.generate(
-        model="dall-e-3",
-        prompt=prompt,
-        n=1,
-        size="1792x1024",
-        response_format="b64_json",
-    )
-    image_b64 = response.data[0].b64_json
-    image_bytes = io.BytesIO(base64.b64decode(image_b64))
-    image = Image.open(image_bytes)
+    images = pipeline(prompt=prompt, height=1024, width=1024, num_inference_steps=50, guidance_scale=7.5).images
+    image = images[0]
     background_file_path = output_dir / "background.png"
     logger.debug(f"Saving background image to: {background_file_path}")
     image.save(background_file_path)
