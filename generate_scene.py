@@ -101,7 +101,7 @@ def generate_background(scene: Scene, output_dir: Path = Path("./Unity/AIML Rese
     prompt = scene.stable_diffusion_scene_skybox_prompt
     logger.debug(f"Generating background with prompt: {prompt}")
 
-    images = pipeline(prompt=prompt, height=1024, width=1024, num_inference_steps=50, guidance_scale=7.5).images
+    images = pipeline(prompt=prompt, height=2048, width=2048, num_inference_steps=50, guidance_scale=7.5).images
     image = images[0]
     background_file_path = output_dir / "background.png"
     logger.debug(f"Saving background image to: {background_file_path}")
