@@ -2,6 +2,8 @@ import base64
 import json
 import logging
 import re
+import subprocess
+import tempfile
 import warnings
 from pathlib import Path
 
@@ -115,19 +117,108 @@ def slugify(text: str) -> str:
     return result
 
 
+def generate_shap_e_model(
+    object_name: str,
+    output_file: Path,
+    model,
+    diffusion,
+    xm,
+    device,
+    batch_size: int = 1,
+    guidance_scale: float = 15.0,
+) -> None:
+    from shap_e.diffusion.sample import sample_latents
+    from shap_e.util.notebooks import decode_latent_mesh
+
+    logger.debug(f"Sampling latents for object: {object_name}")
+    latents = sample_latents(
+        batch_size=batch_size,
+        model=model,
+        diffusion=diffusion,
+        guidance_scale=guidance_scale,
+        model_kwargs=dict(texts=[object_name] * batch_size),
+        progress=True,
+        clip_denoised=True,
+        use_fp16=True,
+        use_karras=True,
+        karras_steps=64,
+        sigma_min=1e-3,
+        sigma_max=160,
+        s_churn=0,
+    )
+    logger.debug("Latent sampling completed")
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_path = Path(tmpdir)
+        ply_file = tmp_path / "mesh.ply"
+
+        print(f"Saving intermediate PLY to: {ply_file}")
+        logger.debug(f"Decoding latent mesh to PLY: {ply_file}")
+        t = decode_latent_mesh(xm, latents[0]).tri_mesh()
+        with open(ply_file, "wb") as f:
+            t.write_ply(f)
+        logger.debug("PLY file written successfully")
+
+        # Call Blender to convert PLY → GLB
+        blender_script = Path("./Blender/export.py").resolve()
+        command = [
+            "blender",
+            "-b",
+            "-P",
+            str(blender_script),
+            "--",
+            str(ply_file),
+            str(output_file),
+        ]
+        print("Running Blender export script...")
+        logger.debug(f"Running Blender command: {' '.join(command)}")
+        subprocess.run(command, check=True)
+        logger.debug("Blender export completed successfully")
+
+
+def generate_hunyuan_model(
+    hunyuan_world_server_url: str,
+    object_name: str,
+    output_file: Path,
+) -> None:
+    object_request = requests.post(
+        f"{hunyuan_world_server_url}/generate",
+        json={"text": object_name, "texture": True},
+        headers={"Content-Type": "application/json"},
+    )
+    with open(output_file, "wb") as f:
+        f.write(object_request.content)
+
+
 def generate_object_models(
     scene: Scene,
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
     batch_size: int = 1,  # the size of the models, higher values take longer to generate
     guidance_scale: float = 15.0,  # the scale of the guidance, higher values make the model look more like the prompt
+    use_shap_e: bool = False,
 ) -> None:
     logger.debug(
         f"generate_object_models called with output_dir: {output_dir}, "
-        f"batch_size: {batch_size}, guidance_scale: {guidance_scale}"
+        f"batch_size: {batch_size}, guidance_scale: {guidance_scale}, use_shap_e: {use_shap_e}"
     )
     glb_dir = output_dir / "GLB"
     glb_dir.mkdir(parents=True, exist_ok=True)
     logger.debug(f"Created GLB directory: {glb_dir}")
+
+    if use_shap_e:
+        import torch
+        from shap_e.diffusion.gaussian_diffusion import diffusion_from_config
+        from shap_e.models.download import load_config, load_model
+
+        print("Loading models...")
+        logger.debug("Loading Shap-E models")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        logger.debug(f"Using device: {device}")
+        xm = load_model("transmitter", device=device)
+        model = load_model("text300M", device=device)
+        diffusion = diffusion_from_config(load_config("diffusion"))
+        print("Done loading models...")
+        logger.debug("Successfully loaded all Shap-E models")
 
     object_names = set(object.name for object in scene.objects)
     logger.debug(f"Unique object names to generate: {object_names}")
@@ -139,14 +230,22 @@ def generate_object_models(
         output_file = glb_dir / f"{base_name}.glb"
 
         print(f"Generating model for prompt: '{object_name}'")
+        if use_shap_e:
+            generate_shap_e_model(
+                object_name=object_name,
+                output_file=output_file,
+                model=model,
+                diffusion=diffusion,
+                xm=xm,
+                device=device,
+                batch_size=batch_size,
+                guidance_scale=guidance_scale,
+            )
+        else:
+            generate_hunyuan_model(
+                hunyuan_world_server_url="http://10.12.65.80:8080", object_name=object_name, output_file=output_file
+            )
 
-        object_request = requests.post(
-            "http://10.12.65.80:8080/generate",
-            json={"text": object_name, "texture": True},
-            headers={"Content-Type": "application/json"},
-        )
-        with open(output_file, "wb") as f:
-            f.write(object_request.content)
         logger.debug(f"Successfully generated model file: {output_file}")
 
     logger.debug("All object models generated successfully")
@@ -252,6 +351,7 @@ def generate_scene(
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
     model_batch_size: int = 1,
     model_guidance_scale: float = 15.0,
+    use_shap_e: bool = False,
 ) -> None:
     logger.debug(
         f"generate_scene command called with prompt: {prompt}, "
@@ -262,7 +362,7 @@ def generate_scene(
     logger.debug("Scene object generated, saving scene")
     save_scene(scene, output_dir)
     logger.debug("Scene saved, generating object models")
-    generate_object_models(scene, output_dir, model_batch_size, model_guidance_scale)
+    generate_object_models(scene, output_dir, model_batch_size, model_guidance_scale, use_shap_e)
     logger.debug("Object models generated, generating background")
     generate_background(scene, output_dir)
     print(f"Scene generation complete. Output in {output_dir}")
