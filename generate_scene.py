@@ -2,11 +2,10 @@ import base64
 import json
 import logging
 import re
-import subprocess
-import tempfile
 import warnings
 from pathlib import Path
 
+import requests
 import typer
 from pydantic import BaseModel
 
@@ -130,22 +129,6 @@ def generate_object_models(
     glb_dir.mkdir(parents=True, exist_ok=True)
     logger.debug(f"Created GLB directory: {glb_dir}")
 
-    import torch
-    from shap_e.diffusion.gaussian_diffusion import diffusion_from_config
-    from shap_e.diffusion.sample import sample_latents
-    from shap_e.models.download import load_config, load_model
-    from shap_e.util.notebooks import decode_latent_mesh
-
-    print("Loading models...")
-    logger.debug("Loading Shap-E models")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    logger.debug(f"Using device: {device}")
-    xm = load_model("transmitter", device=device)
-    model = load_model("text300M", device=device)
-    diffusion = diffusion_from_config(load_config("diffusion"))
-    print("Done loading models...")
-    logger.debug("Successfully loaded all Shap-E models")
-
     object_names = set(object.name for object in scene.objects)
     logger.debug(f"Unique object names to generate: {object_names}")
 
@@ -156,52 +139,14 @@ def generate_object_models(
         output_file = glb_dir / f"{base_name}.glb"
 
         print(f"Generating model for prompt: '{object_name}'")
-        logger.debug(f"Sampling latents for object: {object_name}")
-        latents = sample_latents(
-            batch_size=batch_size,
-            model=model,
-            diffusion=diffusion,
-            guidance_scale=guidance_scale,
-            model_kwargs=dict(texts=[object_name] * batch_size),
-            progress=True,
-            clip_denoised=True,
-            use_fp16=True,
-            use_karras=True,
-            karras_steps=64,
-            sigma_min=1e-3,
-            sigma_max=160,
-            s_churn=0,
+
+        object_request = requests.post(
+            "http://10.12.65.80:8080/generate",
+            json={"text": object_name, "texture": True},
+            headers={"Content-Type": "application/json"},
         )
-        logger.debug("Latent sampling completed")
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmp_path = Path(tmpdir)
-            ply_file = tmp_path / "mesh.ply"
-
-            print(f"Saving intermediate PLY to: {ply_file}")
-            logger.debug(f"Decoding latent mesh to PLY: {ply_file}")
-            t = decode_latent_mesh(xm, latents[0]).tri_mesh()
-            with open(ply_file, "wb") as f:
-                t.write_ply(f)
-            logger.debug("PLY file written successfully")
-
-            # Call Blender to convert PLY → GLB
-            blender_script = Path("./Blender/export.py").resolve()
-            command = [
-                "blender",
-                "-b",
-                "-P",
-                str(blender_script),
-                "--",
-                str(ply_file),
-                str(output_file),
-            ]
-            print("Running Blender export script...")
-            logger.debug(f"Running Blender command: {' '.join(command)}")
-            subprocess.run(command, check=True)
-            logger.debug("Blender export completed successfully")
-
-        print(f"Exported: {output_file}")
+        with open(output_file, "wb") as f:
+            f.write(object_request.content)
         logger.debug(f"Successfully generated model file: {output_file}")
 
     logger.debug("All object models generated successfully")
