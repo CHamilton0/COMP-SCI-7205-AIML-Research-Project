@@ -1,12 +1,102 @@
 {
-    "stable_diffusion_scene_skybox_prompt": "a vibrant and star-filled cosmos with swirling galaxies, nebulae in various colors, and distant celestial bodies emitting a soft glow",
+    "stable_diffusion_scene_skybox_prompt": "A vast, star-filled space with swirling galaxies, distant nebulae in vibrant purples and blues, and scattered luminous stars against a deep black void. Comets streak across the sky, leaving shimmering tails.",
     "objects": [
         {
             "name": "Planet",
             "position": {
-                "x": 10.0,
+                "x": 0.0,
+                "y": -3.0,
+                "z": 20.0
+            },
+            "size": {
+                "x": 5.0,
                 "y": 5.0,
-                "z": -20.0
+                "z": 5.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Asteroid",
+            "position": {
+                "x": 5.0,
+                "y": 2.0,
+                "z": 15.0
+            },
+            "size": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": 1.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Asteroid",
+            "position": {
+                "x": 7.0,
+                "y": -1.0,
+                "z": 18.0
+            },
+            "size": {
+                "x": 1.5,
+                "y": 1.5,
+                "z": 1.5
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Satellite",
+            "position": {
+                "x": -3.0,
+                "y": 3.0,
+                "z": 10.0
+            },
+            "size": {
+                "x": 0.5,
+                "y": 0.5,
+                "z": 0.5
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 45.0,
+                "y": 60.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Comet",
+            "position": {
+                "x": -10.0,
+                "y": 1.0,
+                "z": 5.0
+            },
+            "size": {
+                "x": 0.3,
+                "y": 0.3,
+                "z": 2.0
+            },
+            "rotation_euler_angles_degrees": {
+                "x": 0.0,
+                "y": 90.0,
+                "z": 0.0
+            }
+        },
+        {
+            "name": "Space Station",
+            "position": {
+                "x": -15.0,
+                "y": -5.0,
+                "z": 30.0
             },
             "size": {
                 "x": 3.0,
@@ -18,96 +108,6 @@
                 "y": 45.0,
                 "z": 0.0
             }
-        },
-        {
-            "name": "Asteroid",
-            "position": {
-                "x": -15.0,
-                "y": 2.0,
-                "z": -25.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            }
-        },
-        {
-            "name": "Space Station",
-            "position": {
-                "x": 5.0,
-                "y": -5.0,
-                "z": -15.0
-            },
-            "size": {
-                "x": 5.0,
-                "y": 5.0,
-                "z": 5.0
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 25.0
-            }
-        },
-        {
-            "name": "Satellite",
-            "position": {
-                "x": -8.0,
-                "y": 4.0,
-                "z": -10.0
-            },
-            "size": {
-                "x": 2.0,
-                "y": 2.0,
-                "z": 2.0
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 0.0,
-                "y": 90.0,
-                "z": 0.0
-            }
-        },
-        {
-            "name": "Comet",
-            "position": {
-                "x": -3.0,
-                "y": 9.0,
-                "z": -30.0
-            },
-            "size": {
-                "x": 0.5,
-                "y": 0.5,
-                "z": 3.0
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 20.0,
-                "y": 0.0,
-                "z": 10.0
-            }
-        },
-        {
-            "name": "Meteor",
-            "position": {
-                "x": 7.0,
-                "y": -3.0,
-                "z": -40.0
-            },
-            "size": {
-                "x": 1.0,
-                "y": 1.0,
-                "z": 1.0
-            },
-            "rotation_euler_angles_degrees": {
-                "x": 0.0,
-                "y": -20.0,
-                "z": 0.0
-            }
         }
     ],
     "camera": {
@@ -115,7 +115,7 @@
         "position": {
             "x": 0.0,
             "y": 0.0,
-            "z": 0.0
+            "z": 5.0
         },
         "size": {
             "x": 0.0,

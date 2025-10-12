@@ -92,7 +92,7 @@ def generate_shap_e_model(
 
 
 def generate_hunyuan_model(
-    hunyuan_world_server_url: str,
+    hunyuan_server_url: str,
     object_name: str,
     output_file: Path,
 ) -> None:
@@ -100,7 +100,7 @@ def generate_hunyuan_model(
     Generate a 3D model using the Hunyuan World server. Places the generated GLB file at output_file.
 
     Args:
-        hunyuan_world_server_url (str): The base URL of the Hunyuan World server
+        hunyuan_server_url (str): The base URL of the Hunyuan World server
         object_name (str): The text prompt for the object to generate
         output_file (Path): The path to save the generated GLB file
     Returns:
@@ -108,7 +108,7 @@ def generate_hunyuan_model(
     """
 
     object_request = requests.post(
-        f"{hunyuan_world_server_url}/generate",
+        f"{hunyuan_server_url}/generate",
         json={"text": object_name, "texture": True},
         headers={"Content-Type": "application/json"},
     )

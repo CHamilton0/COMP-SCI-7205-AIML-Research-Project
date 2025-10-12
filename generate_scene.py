@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+import os
 import warnings
 from pathlib import Path
 
@@ -10,7 +11,8 @@ from scene_classes import Scene, SceneImageAnalysisResult
 from model_generation import generate_object_models
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Hide future warnings from shap_e
