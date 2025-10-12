@@ -12,6 +12,7 @@ app = typer.Typer(add_completion=False)
 def run(
     prompt: str,
     output_dir: Path = Path("./generated_scenes_test"),
+    hunyuan_server_url: str | None = None,
 ) -> None:
     start_time = datetime.now()
     formatted_time = start_time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -26,7 +27,11 @@ def run(
             with open(iteration_output_directory / "prompt.txt", "w") as prompt_file:
                 prompt_file.write(prompt)
 
-            generate_scene(prompt, iteration_output_directory)
+            generate_scene(
+                prompt,
+                hunyuan_server_url=hunyuan_server_url,
+                output_dir=iteration_output_directory,
+            )
 
 
 if __name__ == "__main__":
