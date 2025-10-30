@@ -7,7 +7,8 @@ from pathlib import Path
 import typer
 
 from scene_classes import Scene
-from model_generation import generate_object_models
+from model_generation import generate_object_models, slugify
+from background_generation import generate_background_image
 
 # Configure logging
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -40,10 +41,14 @@ def generate_scene_object(prompt: str) -> Scene:
                 "content": (
                     "Imagine a scene based on the prompt with many objects in the scene."
                     "Extract the scene information. Ensure the prompt for the scene skybox could generate a skybox"
-                    "image that could be used on a spherical shader. Add as many objects to the scene as needed,"
-                    "multiple copies of the same object are cheap and easy to do. Include a camera object with position"
-                    "and rotation_euler_angles_degrees to set the camera position and angle so that it captures the"
-                    "objects in the scene."
+                    "image that could be used on a panoramic spherical shader. Include negative prompts in the skybox"
+                    "as well to tune the output for things that should not be present. Add as many objects to the scene"
+                    "as needed, multiple copies of the same object are cheap and easy to do as long as the name is the"
+                    "same. Include a camera object with position and rotation_euler_angles_degrees to set the camera"
+                    "position and angle so that it captures the objects in the scene. Include the floor as a large flat"
+                    "plane object which other objects will be on top of if it makes sense for the type of scene, e.g. a"
+                    "space scene may not need a floor. Keep the size of objects close to a constant ratio between the"
+                    "x, y, and z dimensions so that objects appear proportionate and realistic within the scene."
                 ),
             },
             {
@@ -82,37 +87,6 @@ def save_scene_json(scene: Scene, output_dir: Path = Path("./Unity/AIML Research
     logger.debug("Scene successfully saved to file")
 
 
-def save_background_image(scene: Scene, output_dir: Path = Path("./Unity/AIML Research Project/Assets")) -> None:
-    """
-    Generate a background image using the skybox prompt from scene.
-    Args:
-        scene (Scene): The scene object containing the skybox prompt.
-        output_dir (Path): The directory to save the background image in.
-    Returns:
-        None
-    """
-
-    logger.debug(f"generate_background called with output_dir: {output_dir}")
-    import torch
-    from diffusers import StableDiffusionPipeline
-
-    logger.debug("Loading Stable Diffusion pipeline")
-    pipeline = StableDiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-2", torch_dtype=torch.float16)
-
-    pipeline = pipeline.to("cuda")
-    logger.debug("Pipeline loaded and moved to CUDA")
-
-    prompt = scene.stable_diffusion_scene_skybox_prompt
-    logger.debug(f"Generating background with prompt: {prompt}")
-
-    images = pipeline(prompt=prompt, height=2048, width=2048, num_inference_steps=50, guidance_scale=7.5).images
-    image = images[0]
-    background_file_path = output_dir / "background.png"
-    logger.debug(f"Saving background image to: {background_file_path}")
-    image.save(background_file_path)
-    logger.debug("Background image successfully generated and saved")
-
-
 app = typer.Typer(add_completion=False)
 
 
@@ -120,6 +94,7 @@ app = typer.Typer(add_completion=False)
 def generate_scene(
     prompt: str,
     hunyuan_server_url: str | None = None,
+    hunyuan_panorama_server_url: str | None = None,
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
     model_batch_size: int = 1,
     model_guidance_scale: float = 15.0,
@@ -154,7 +129,7 @@ def generate_scene(
         hunyuan_server_url=hunyuan_server_url,
     )
     logger.debug("Object models generated, generating background")
-    save_background_image(scene, output_dir)
+    generate_background_image(scene, output_dir, hunyuan_panorama_server_url=hunyuan_panorama_server_url)
     logger.debug("Scene generation completed successfully")
 
 
@@ -197,7 +172,9 @@ def models(
 
 
 @app.command(help="Generate a background image using the skybox prompt from scene.json.")
-def background() -> None:
+def background(
+    hunyuan_panorama_server_url: str | None = None,
+) -> None:
     """Generate the skybox image only (using Stable Diffusion)"""
     logger.debug("background command called")
     scene_file_path = "./Unity/AIML Research Project/Assets/scene.json"
@@ -206,8 +183,77 @@ def background() -> None:
         scene_dict = json.load(f)
     s = Scene.model_validate(scene_dict)
     logger.debug("Scene loaded, generating background")
-    save_background_image(s)
+    generate_background_image(s, hunyuan_panorama_server_url=hunyuan_panorama_server_url)
     logger.debug("Background generation completed")
+
+
+@app.command(help="Generate scenes from a list of prompts in a file.")
+def batch_generate(
+    prompts_file: Path = Path("./prompts.txt"),
+    output_dir: Path = Path("./generated_scenes_test"),
+    hunyuan_server_url: str | None = None,
+    hunyuan_panorama_server_url: str | None = None,
+    model_batch_size: int = 50,
+    model_guidance_scale: float = 10.0,
+) -> None:
+    """
+    Read prompts from a file (one per line) and generate scenes for each.
+
+    Args:
+        prompts_file (Path): Path to text file containing prompts (one per line).
+        output_dir (Path): Base directory for generated scenes.
+        hunyuan_server_url (str | None): URL of the Hunyuan server, if used.
+        hunyuan_panorama_server_url (str | None): URL of the Hunyuan panorama server, if used.
+        model_batch_size (int): Batch size for model generation.
+        model_guidance_scale (float): Guidance scale for model generation.
+    """
+    from datetime import datetime
+
+    logger.info(f"Reading prompts from: {prompts_file}")
+
+    if not prompts_file.exists():
+        logger.error(f"Prompts file not found: {prompts_file}")
+        return
+
+    # Read all prompts from file
+    with open(prompts_file, "r") as f:
+        prompts = [line.strip() for line in f if line.strip()]
+
+    logger.info(f"Found {len(prompts)} prompts to process")
+
+    start_time = datetime.now()
+    formatted_time = start_time.strftime("%Y-%m-%d_%H-%M-%S")
+
+    for idx, prompt in enumerate(prompts, 1):
+        logger.info(f"Processing prompt {idx}/{len(prompts)}: {prompt}")
+
+        safe_prompt = slugify(prompt)[:50]
+        iteration_output_directory = output_dir / f"{formatted_time}-{idx:03d}-{safe_prompt}"
+        iteration_output_directory.mkdir(parents=True, exist_ok=True)
+
+        with open(iteration_output_directory / "prompt.txt", "w") as prompt_file:
+            prompt_file.write(prompt)
+
+        try:
+            generate_scene(
+                prompt,
+                hunyuan_server_url=hunyuan_server_url,
+                hunyuan_panorama_server_url=hunyuan_panorama_server_url,
+                output_dir=iteration_output_directory,
+                model_batch_size=model_batch_size,
+                model_guidance_scale=model_guidance_scale,
+            )
+            logger.info(f"Successfully generated scene {idx}/{len(prompts)}")
+        except Exception as e:
+            logger.error(f"Failed to generate scene for prompt '{prompt}': {e}")
+            continue
+
+    end_time = datetime.now()
+    duration = end_time - start_time
+    logger.info("Batch generation complete")
+    logger.info(f"Total prompts processed: {len(prompts)}")
+    logger.info(f"Total time: {duration}")
+    logger.info(f"Output directory: {output_dir}")
 
 
 if __name__ == "__main__":

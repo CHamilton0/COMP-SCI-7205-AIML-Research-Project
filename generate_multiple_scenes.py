@@ -13,6 +13,7 @@ def run(
     prompt: str,
     output_dir: Path = Path("./generated_scenes_test"),
     hunyuan_server_url: str | None = None,
+    hunyuan_panorama_server_url: str | None = None,
 ) -> None:
     start_time = datetime.now()
     formatted_time = start_time.strftime("%Y-%m-%d_%H-%M-%S")
@@ -30,6 +31,7 @@ def run(
             generate_scene(
                 prompt,
                 hunyuan_server_url=hunyuan_server_url,
+                hunyuan_panorama_server_url=hunyuan_panorama_server_url,
                 output_dir=iteration_output_directory,
             )
 

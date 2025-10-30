@@ -15,7 +15,8 @@ class SceneObject(BaseModel):
 
 
 class Scene(BaseModel):
-    stable_diffusion_scene_skybox_prompt: str
+    scene_skybox_prompt: str
+    scene_skybox_negative_prompt: str
     objects: list[SceneObject]
     camera: SceneObject
 
