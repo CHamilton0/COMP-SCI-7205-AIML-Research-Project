@@ -95,6 +95,7 @@ def generate_scene(
     prompt: str,
     hunyuan_server_url: str | None = None,
     hunyuan_panorama_server_url: str | None = None,
+    stitch_diffusion_server_url: str | None = None,
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
     model_batch_size: int = 1,
     model_guidance_scale: float = 15.0,
@@ -111,16 +112,26 @@ def generate_scene(
     Returns:
         None
     """
+    import time
 
+    scene_start_time = time.time()
     logger.debug(
         f"generate_scene command called with prompt: {prompt}, "
         f"output_dir: {output_dir}, model_batch_size: {model_batch_size}, "
         f"model_guidance_scale: {model_guidance_scale}"
     )
+
+    # Generate scene layout
+    layout_start = time.time()
     scene = generate_scene_object(prompt)
-    logger.debug("Scene object generated, saving scene")
+    layout_duration = time.time() - layout_start
+    logger.debug(f"Scene object generated in {layout_duration:.2f}s, saving scene")
+
     save_scene_json(scene, output_dir)
     logger.debug("Scene saved, generating object models")
+
+    # Generate object models
+    models_start = time.time()
     generate_object_models(
         scene,
         output_dir,
@@ -128,9 +139,26 @@ def generate_scene(
         guidance_scale=model_guidance_scale,
         hunyuan_server_url=hunyuan_server_url,
     )
-    logger.debug("Object models generated, generating background")
-    generate_background_image(scene, output_dir, hunyuan_panorama_server_url=hunyuan_panorama_server_url)
-    logger.debug("Scene generation completed successfully")
+    models_duration = time.time() - models_start
+    logger.debug(f"Object models generated in {models_duration:.2f}s, generating background")
+
+    # Generate background
+    background_start = time.time()
+    generate_background_image(
+        scene,
+        output_dir,
+        hunyuan_panorama_server_url=hunyuan_panorama_server_url,
+        stitch_diffusion_server_url=stitch_diffusion_server_url,
+    )
+    background_duration = time.time() - background_start
+    logger.debug(f"Background generated in {background_duration:.2f}s")
+
+    # Total time
+    total_duration = time.time() - scene_start_time
+    logger.debug(
+        f"Scene generation completed in {total_duration:.2f}s "
+        f"(layout: {layout_duration:.2f}s, models: {models_duration:.2f}s, background: {background_duration:.2f}s)"
+    )
 
 
 @app.command()
@@ -174,6 +202,7 @@ def models(
 @app.command(help="Generate a background image using the skybox prompt from scene.json.")
 def background(
     hunyuan_panorama_server_url: str | None = None,
+    stitch_diffusion_server_url: str | None = None,
 ) -> None:
     """Generate the skybox image only (using Stable Diffusion)"""
     logger.debug("background command called")
@@ -183,7 +212,11 @@ def background(
         scene_dict = json.load(f)
     s = Scene.model_validate(scene_dict)
     logger.debug("Scene loaded, generating background")
-    generate_background_image(s, hunyuan_panorama_server_url=hunyuan_panorama_server_url)
+    generate_background_image(
+        s,
+        hunyuan_panorama_server_url=hunyuan_panorama_server_url,
+        stitch_diffusion_server_url=stitch_diffusion_server_url,
+    )
     logger.debug("Background generation completed")
 
 
@@ -193,6 +226,7 @@ def batch_generate(
     output_dir: Path = Path("./generated_scenes_test"),
     hunyuan_server_url: str | None = None,
     hunyuan_panorama_server_url: str | None = None,
+    stitch_diffusion_server_url: str | None = None,
     model_batch_size: int = 50,
     model_guidance_scale: float = 10.0,
 ) -> None:
@@ -242,6 +276,7 @@ def batch_generate(
                 prompt,
                 hunyuan_server_url=hunyuan_server_url,
                 hunyuan_panorama_server_url=hunyuan_panorama_server_url,
+                stitch_diffusion_server_url=stitch_diffusion_server_url,
                 output_dir=iteration_output_directory,
                 model_batch_size=model_batch_size,
                 model_guidance_scale=model_guidance_scale,

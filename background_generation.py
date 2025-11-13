@@ -50,6 +50,7 @@ def generate_background_image(
     scene: Scene,
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
     hunyuan_panorama_server_url: str | None = None,
+    stitch_diffusion_server_url: str | None = None,
 ) -> None:
     """
     Generate a background image for the scene in the output directory
@@ -61,9 +62,7 @@ def generate_background_image(
         None
     """
 
-    if hunyuan_panorama_server_url is None:
-        save_background_image(scene, output_dir)
-    else:
+    if hunyuan_panorama_server_url is not None:
         object_request = requests.get(
             f"{hunyuan_panorama_server_url}/generate-panorama",
             params={
@@ -75,3 +74,17 @@ def generate_background_image(
         background_file_path = output_dir / "background.png"
         with open(background_file_path, "wb") as f:
             f.write(object_request.content)
+    elif stitch_diffusion_server_url is not None:
+        object_request = requests.get(
+            f"{stitch_diffusion_server_url}/generate/file",
+            params={
+                "prompt": scene.scene_skybox_prompt,
+                "negative_prompt": scene.scene_skybox_negative_prompt,
+            },
+        )
+
+        background_file_path = output_dir / "background.png"
+        with open(background_file_path, "wb") as f:
+            f.write(object_request.content)
+    else:
+        save_background_image(scene, output_dir)

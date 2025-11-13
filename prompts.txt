@@ -11,10 +11,50 @@
 # an alien solar system with multiple moons and gas giants
 # a spacecraft graveyard floating in the depths of space
 # a comet tail streaming through the solar system
-a stellar nursery with newborn stars emerging from gas clouds
-a space scene with floating space rocks and ancient alien artifacts
-a binary star system with orbiting planets
-a wormhole portal surrounded by swirling energy in space
-a meteor shower passing through a planetary system
-a space anomaly with strange geometric structures floating in zero gravity
-a distant exoplanet system viewed from deep space
+# a stellar nursery with newborn stars emerging from gas clouds
+# a space scene with floating space rocks and ancient alien artifacts
+# a binary star system with orbiting planets
+# a wormhole portal surrounded by swirling energy in space
+# a meteor shower passing through a planetary system
+# a space anomaly with strange geometric structures floating in zero gravity
+# a distant exoplanet system viewed from deep space
+a pulsar emitting beams of radiation through dense cosmic clouds
+a dying red giant star surrounded by ejected stellar material
+a trojan asteroid cluster orbiting at a lagrange point
+a kuiper belt region with icy bodies and dwarf planets
+a protoplanetary disk swirling around a young star
+a magnetar with visible magnetic field lines distorting space
+a quasar blazing at the center of a distant galaxy
+a rogue planet drifting through interstellar space
+a brown dwarf with faint auroras and orbiting debris
+a collision between two neutron stars creating gravitational waves
+an oort cloud with scattered comets at the edge of a solar system
+a heliopause boundary where solar wind meets interstellar medium
+a globular cluster with thousands of ancient stars densely packed
+a dark matter halo visualized with gravitational lensing effects
+a space elevator tether extending from a planet into orbit
+a dyson swarm of solar collectors surrounding a star
+a generation ship floating through the void between star systems
+a mining operation on an iron-rich metallic asteroid
+a gas giant's upper atmosphere with floating research platforms
+a tidally locked planet with eternal day and night sides
+a cataclysmic variable star system with matter transfer between stars
+a planetary nebula with expanding shells of ionized gas
+a wolf-rayet star ejecting massive stellar winds into space
+a circumstellar disk around a young T Tauri star
+a triple star system with complex orbital mechanics
+a blazar jet shooting gamma rays across deep space
+a starburst galaxy with intense stellar formation
+a molecular cloud complex with dark nebulae and protostars
+a white dwarf cooling in the vastness of space
+a herbig-haro object with bipolar jets from a newborn star
+a bok globule collapsing to form new stars
+a reflection nebula illuminated by nearby bright stars
+an emission nebula glowing with hydrogen alpha light
+a dark energy void between galaxy superclusters
+a cosmic web filament connecting galaxy clusters
+a gamma-ray burst afterglow fading in deep space
+an x-ray binary system with a compact object accreting matter
+a cepheid variable star pulsating with rhythmic brightness changes
+a stellar stream from a disrupted dwarf galaxy
+a gravitational wave observatory floating in solar orbit
