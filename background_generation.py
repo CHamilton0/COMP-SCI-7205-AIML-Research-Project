@@ -75,9 +75,9 @@ def generate_background_image(
         with open(background_file_path, "wb") as f:
             f.write(object_request.content)
     elif stitch_diffusion_server_url is not None:
-        object_request = requests.get(
+        object_request = requests.post(
             f"{stitch_diffusion_server_url}/generate/file",
-            params={
+            json={
                 "prompt": scene.scene_skybox_prompt,
                 "negative_prompt": scene.scene_skybox_negative_prompt,
             },
