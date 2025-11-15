@@ -12,7 +12,16 @@ from background_generation import generate_background_image
 
 # Configure logging
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
-logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+log_file = Path("scene_generation.log")
+logging.basicConfig(
+    level=log_level,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(log_file, mode="a"),  # Append mode
+        logging.StreamHandler(),  # Also output to console
+    ],
+    force=True,  # Override any existing logging configuration
+)
 logger = logging.getLogger(__name__)
 
 # Hide future warnings from shap_e

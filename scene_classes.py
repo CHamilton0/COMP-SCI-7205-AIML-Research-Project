@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Vector3(BaseModel):
@@ -25,3 +25,10 @@ class SceneImageAnalysisResult(BaseModel):
     objects_in_first_image: list[str]
     objects_in_second_image: list[str]
     first_image_better_scene: bool
+
+
+class SceneImageRatingResult(BaseModel):
+    # Scores from 1 to 10
+    background_score: int = Field(..., ge=1, le=10)
+    objects_score: int = Field(..., ge=1, le=10)
+    layout_score: int = Field(..., ge=1, le=10)

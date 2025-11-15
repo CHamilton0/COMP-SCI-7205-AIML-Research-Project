@@ -18,43 +18,89 @@
 # a meteor shower passing through a planetary system
 # a space anomaly with strange geometric structures floating in zero gravity
 # a distant exoplanet system viewed from deep space
-a pulsar emitting beams of radiation through dense cosmic clouds
-a dying red giant star surrounded by ejected stellar material
-a trojan asteroid cluster orbiting at a lagrange point
-a kuiper belt region with icy bodies and dwarf planets
-a protoplanetary disk swirling around a young star
-a magnetar with visible magnetic field lines distorting space
-a quasar blazing at the center of a distant galaxy
-a rogue planet drifting through interstellar space
-a brown dwarf with faint auroras and orbiting debris
-a collision between two neutron stars creating gravitational waves
-an oort cloud with scattered comets at the edge of a solar system
-a heliopause boundary where solar wind meets interstellar medium
-a globular cluster with thousands of ancient stars densely packed
-a dark matter halo visualized with gravitational lensing effects
-a space elevator tether extending from a planet into orbit
-a dyson swarm of solar collectors surrounding a star
-a generation ship floating through the void between star systems
-a mining operation on an iron-rich metallic asteroid
-a gas giant's upper atmosphere with floating research platforms
-a tidally locked planet with eternal day and night sides
-a cataclysmic variable star system with matter transfer between stars
-a planetary nebula with expanding shells of ionized gas
-a wolf-rayet star ejecting massive stellar winds into space
-a circumstellar disk around a young T Tauri star
-a triple star system with complex orbital mechanics
-a blazar jet shooting gamma rays across deep space
-a starburst galaxy with intense stellar formation
-a molecular cloud complex with dark nebulae and protostars
-a white dwarf cooling in the vastness of space
-a herbig-haro object with bipolar jets from a newborn star
-a bok globule collapsing to form new stars
-a reflection nebula illuminated by nearby bright stars
-an emission nebula glowing with hydrogen alpha light
-a dark energy void between galaxy superclusters
-a cosmic web filament connecting galaxy clusters
-a gamma-ray burst afterglow fading in deep space
-an x-ray binary system with a compact object accreting matter
-a cepheid variable star pulsating with rhythmic brightness changes
-a stellar stream from a disrupted dwarf galaxy
-a gravitational wave observatory floating in solar orbit
+# a pulsar emitting beams of radiation through dense cosmic clouds
+# a dying red giant star surrounded by ejected stellar material
+# a trojan asteroid cluster orbiting at a lagrange point
+# a kuiper belt region with icy bodies and dwarf planets
+# a protoplanetary disk swirling around a young star
+# a magnetar with visible magnetic field lines distorting space
+# a quasar blazing at the center of a distant galaxy
+# a rogue planet drifting through interstellar space
+# a brown dwarf with faint auroras and orbiting debris
+# a collision between two neutron stars creating gravitational waves
+# an oort cloud with scattered comets at the edge of a solar system
+# a heliopause boundary where solar wind meets interstellar medium
+# a globular cluster with thousands of ancient stars densely packed
+# a dark matter halo visualized with gravitational lensing effects
+# a space elevator tether extending from a planet into orbit
+# a dyson swarm of solar collectors surrounding a star
+# a generation ship floating through the void between star systems
+# a mining operation on an iron-rich metallic asteroid
+# a gas giant's upper atmosphere with floating research platforms
+# a tidally locked planet with eternal day and night sides
+# a cataclysmic variable star system with matter transfer between stars
+# a planetary nebula with expanding shells of ionized gas
+# a wolf-rayet star ejecting massive stellar winds into space
+# a circumstellar disk around a young T Tauri star
+# a triple star system with complex orbital mechanics
+# a blazar jet shooting gamma rays across deep space
+# a starburst galaxy with intense stellar formation
+# a molecular cloud complex with dark nebulae and protostars
+# a white dwarf cooling in the vastness of space
+# a herbig-haro object with bipolar jets from a newborn star
+# a bok globule collapsing to form new stars
+# a reflection nebula illuminated by nearby bright stars
+# an emission nebula glowing with hydrogen alpha light
+# a dark energy void between galaxy superclusters
+# a cosmic web filament connecting galaxy clusters
+# a gamma-ray burst afterglow fading in deep space
+# an x-ray binary system with a compact object accreting matter
+# a cepheid variable star pulsating with rhythmic brightness changes
+# a stellar stream from a disrupted dwarf galaxy
+# a gravitational wave observatory floating in solar orbit
+# a vibrant alien marketplace with hundreds of glowing neon stalls and colorful holographic displays floating in zero gravity
+# a cyberpunk space station interior with bright pink and blue neon tubes dozens of glowing control panels and colorful data streams
+# a massive sci-fi hangar bay filled with dozens of colorful spacecraft each with bright running lights and glowing engines
+# an alien crystal garden floating in space with hundreds of luminescent crystals in vivid purples blues greens and oranges
+# a futuristic command center with walls covered in glowing multicolored screens holographic projections and floating data cubes
+# a zero gravity laboratory with countless floating beakers test tubes and apparatus all containing brightly colored glowing liquids
+# a sci-fi cargo bay packed with hundreds of colorful shipping containers each with glowing status lights and holographic labels
+# an alien botanical station with dozens of bioluminescent plants in vibrant colors floating freely in zero gravity
+# a high-tech server room in space with rows upon rows of glowing server racks in electric blues purples and greens
+# a futuristic medical bay with numerous floating medical pods each lit from within with different colored lights and holographic displays
+# a space casino interior with hundreds of colorful slot machines glowing game tables and neon signs floating throughout
+# an advanced weapons testing facility with dozens of glowing energy weapons colorful targeting systems and bright force field generators
+# a cybernetic workshop filled with countless glowing robotic parts cybernetic implants and colorful holographic assembly instructions
+# an alien technology museum with hundreds of mysterious artifacts each glowing in different vibrant colors suspended in zero gravity
+# a sci-fi entertainment district with numerous colorful holographic billboards floating arcade machines and glowing entertainment pods
+# a quantum research lab with dozens of glowing particle accelerators colorful energy containment fields and bright quantum displays
+# a zero gravity art gallery with hundreds of floating holographic sculptures each radiating different vibrant colors
+# an advanced hydroponics farm in space with countless plants in glowing growth chambers lit by colorful LED arrays
+# a futuristic traffic control station monitoring hundreds of colorful ship trajectories with glowing holographic navigation markers
+# a space rave venue with dozens of floating DJ platforms colorful laser arrays and hundreds of glowing geometric light fixtures
+a white space shuttle with orange fuel tank and two white boosters launching through clouds with trailing white smoke
+multiple silver satellites with blue solar panels orbiting above a blue and green Earth
+a large modular space station with white modules and golden solar arrays floating in orbit above Earth
+a tall white rocket standing on a launch pad with red service tower and surrounding ground equipment
+a grey lunar lander on the moon surface with Earth visible in the black sky above
+a red rover vehicle on the orange Martian surface with rocks and distant mountains
+a silver telescope with solar panels floating in space with a colorful nebula behind it
+a green and white capsule spacecraft docking with a space station module
+a grey rocky asteroid tumbling through space with a small probe nearby
+the blue planet Neptune with a grey moon orbiting around it
+golden Saturn with its beige ring system and several small moons
+a golden space probe flying past the orange and white striped gas giant Jupiter
+the grey cratered moon surface with a silver rover and blue Earth on the horizon
+white icy surface of Europa with cracks and a small landing probe
+pale yellow Venus with white clouds and several atmospheric probes orbiting it
+a ring of communication satellites with orange solar panels in orbit around Earth
+grey Mercury surface with craters and a small lander under bright sunlight
+a white and red orbital station circling above the orange planet Mars
+a grey comet with blue glowing tail passing near several tracking probes
+industrial equipment on a dark asteroid with silver containers and orange lights
+a lunar base with white habitats and equipment on grey moon surface with Earth above
+multiple white satellites with instruments and golden panels above Earth's oceans
+a silver deep space probe traveling away from distant blue Earth
+a white capsule with heat shield approaching a space station with Earth below
+a space station with white modules and blue panels orbiting above continents and oceans
+a Mars orbital view with red planet surface multiple white satellites and space station in foreground

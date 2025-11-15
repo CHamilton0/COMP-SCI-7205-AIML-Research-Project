@@ -37,20 +37,30 @@ public class GenerateMultipleScenes
         }
 
         string[] sceneDirs = Directory.GetDirectories(ScenesDirectory);
-        foreach (string dir in sceneDirs)
+        ProcessNextScene(sceneDirs, 0);
+    }
+
+    private static void ProcessNextScene(string[] sceneDirs, int index)
+    {
+        if (index >= sceneDirs.Length)
         {
-            string jsonPath = Path.Combine(dir, "scene.json");
-            if (File.Exists(jsonPath))
-            {
-                Debug.Log($"Processing scene: {dir}");
-                LoadAndPlaceScene(dir);
-            }
-            else
-            {
-                Debug.LogWarning($"No scene.json found in {dir}");
-            }
+            AssetDatabase.Refresh();
+            Debug.Log("All scenes processed!");
+            return;
         }
-        AssetDatabase.Refresh();
+
+        string dir = sceneDirs[index];
+        string jsonPath = Path.Combine(dir, "scene.json");
+        if (File.Exists(jsonPath))
+        {
+            Debug.Log($"Processing scene {index + 1}/{sceneDirs.Length}: {dir}");
+            LoadAndPlaceScene(dir, () => ProcessNextScene(sceneDirs, index + 1));
+        }
+        else
+        {
+            Debug.LogWarning($"No scene.json found in {dir}");
+            ProcessNextScene(sceneDirs, index + 1);
+        }
     }
 
     static Bounds GetBounds(GameObject go)
@@ -172,7 +182,7 @@ public class GenerateMultipleScenes
         return SceneManager.GetActiveScene();
     }
 
-    private static void LoadAndPlaceScene(string dir)
+    private static void LoadAndPlaceScene(string dir, System.Action onComplete)
     {
         // Create a new empty scene in this directory
         Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -200,6 +210,8 @@ public class GenerateMultipleScenes
             EditorApplication.delayCall += () =>
             {
                 CameraUtils.TakeScreenshot(Path.Combine(dir, "screenshot.png"), 1920, 1080);
+                // Move to next scene after screenshot is taken
+                onComplete?.Invoke();
             };
         };
     }

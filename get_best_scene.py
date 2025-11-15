@@ -5,7 +5,7 @@ from pathlib import Path
 
 import typer
 
-from scene_classes import SceneImageAnalysisResult
+from scene_classes import SceneImageAnalysisResult, SceneImageRatingResult
 
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -13,6 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 app = typer.Typer(add_completion=False)
+
+
+def encode_image(image_path: Path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
 
 
 def analyse_scene_images(
@@ -31,10 +36,6 @@ def analyse_scene_images(
     """
     logger.debug(f"get_objects_in_scene called with image_paths: {image_path1} and {image_path2}")
     from openai import OpenAI
-
-    def encode_image(image_path: Path):
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode("utf-8")
 
     openai_client = OpenAI()
     logger.debug("Generating object list with LLM")
@@ -117,6 +118,76 @@ def get_best_scene(
 
     if scene_directories:
         logger.info(f"Best scene found: {scene_directories[0]}")
+
+
+@app.command()
+def evaluate_scenes(
+    generated_scenes_directory: Path = Path("./Unity/AIML Research Project/Assets/generated-scenes"),
+) -> None:
+    """
+    Compare generated scene images and rate them based on the scene prompt.
+    Args:
+        generated_scenes_directory (Path): The directory containing generated scenes.
+    """
+
+    logger.debug(f"evaluate_scenes command called with generated_scenes_directory: {generated_scenes_directory}")
+    scene_directories = sorted(
+        [d for d in generated_scenes_directory.iterdir() if d.is_dir()],
+        key=lambda d: d.stat().st_mtime,
+        reverse=True,
+    )[:2]
+
+    if not scene_directories or len(scene_directories) == 0:
+        logger.error("Not enough scene directories found.")
+        return
+
+    # Create pairs of images to compare until only one best scene remains
+    for scene_dir in scene_directories:
+        prompt_file = scene_dir / "prompt.txt"
+        image_path = scene_dir / "screenshot.png"
+        if not prompt_file.exists() or not image_path.exists():
+            logger.error("No prompt.txt or screenshot.png file found in scene directory.")
+            continue
+        else:
+            with open(prompt_file, "r") as f:
+                scene_prompt = f.read().strip()
+
+            image_path = scene_dir / "screenshot.png"
+
+            from openai import OpenAI
+
+            openai_client = OpenAI()
+            logger.debug("Generating object list with LLM")
+            response = openai_client.responses.parse(
+                model="gpt-4.1",
+                input=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "input_text",
+                                "text": (
+                                    "How well does this image represent the scene described by the following prompt?"
+                                    "Rate it in terms of background, objects, and layout with a score from 1 to 10:"
+                                    f"{scene_prompt}",
+                                ),
+                            },
+                            {
+                                "type": "input_image",
+                                "image_url": f"data:image/png;base64,{encode_image(image_path)}",
+                            },
+                        ],
+                    },
+                ],
+                text_format=SceneImageRatingResult,
+            )
+
+            result: SceneImageRatingResult = response.output_parsed
+            # Save results to a file as JSON
+            result_file = scene_dir / "evaluation.json"
+            with open(result_file, "w") as f:
+                f.write(result.model_dump_json(indent=4))
+            logger.info(f"Saved evaluation results to {result_file}")
 
 
 if __name__ == "__main__":
