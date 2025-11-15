@@ -2,6 +2,7 @@ import logging
 import re
 import subprocess
 import tempfile
+from enum import Enum
 from pathlib import Path
 
 import requests
@@ -9,6 +10,11 @@ import requests
 from scene_classes import Scene
 
 logger = logging.getLogger(__name__)
+
+
+class ObjectModel(str, Enum):
+    SHAP_E = "shap_e"
+    HUNYUAN = "hunyuan"
 
 
 def slugify(text: str) -> str:
@@ -119,7 +125,8 @@ def generate_hunyuan_model(
 def generate_object_models(
     scene: Scene,
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
-    hunyuan_server_url: str | None = None,
+    model: ObjectModel = ObjectModel.SHAP_E,
+    server_url: str | None = None,
     batch_size: int = 1,  # the size of the models, higher values take longer to generate
     guidance_scale: float = 15.0,  # the scale of the guidance, higher values make the model look more like the prompt
 ) -> None:
@@ -129,22 +136,23 @@ def generate_object_models(
     Args:
         scene (Scene): The scene containing objects to generate
         output_dir (Path): The directory to save the generated GLB files
+        model (ObjectModel): The model to use for object generation
+        server_url (str | None): The URL of the server for remote models
         batch_size (int): The size of the models, higher values take longer to generate
         guidance_scale (float): The scale of the guidance, higher values make the model look more like the prompt
-        use_shap_e (bool): Whether to use Shap-E for generation. If False, uses Hunyuan World.
     Returns:
         None
     """
 
     logger.debug(
         f"generate_object_models called with output_dir: {output_dir}, "
-        f"batch_size: {batch_size}, guidance_scale: {guidance_scale}, hunyuan_server_url: {hunyuan_server_url}"
+        f"batch_size: {batch_size}, guidance_scale: {guidance_scale}, model: {model}, server_url: {server_url}"
     )
     glb_dir = output_dir / "GLB"
     glb_dir.mkdir(parents=True, exist_ok=True)
     logger.debug(f"Created GLB directory: {glb_dir}")
 
-    if hunyuan_server_url is None:
+    if model == ObjectModel.SHAP_E:
         import torch
         from shap_e.diffusion.gaussian_diffusion import diffusion_from_config
         from shap_e.models.download import load_config, load_model
@@ -153,9 +161,12 @@ def generate_object_models(
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         logger.debug(f"Using device: {device}")
         xm = load_model("transmitter", device=device)
-        model = load_model("text300M", device=device)
+        shap_e_model = load_model("text300M", device=device)
         diffusion = diffusion_from_config(load_config("diffusion"))
         logger.debug("Successfully loaded all Shap-E models")
+    elif model == ObjectModel.HUNYUAN:
+        if server_url is None:
+            raise ValueError("server_url is required for HUNYUAN model")
 
     object_names = set(object.name for object in scene.objects)
     logger.debug(f"Unique object names to generate: {object_names}")
@@ -166,20 +177,20 @@ def generate_object_models(
         base_name = slugify(object_name)
         output_file = glb_dir / f"{base_name}.glb"
 
-        if hunyuan_server_url is None:
+        if model == ObjectModel.SHAP_E:
             generate_shap_e_model(
                 object_name=object_name,
                 output_file=output_file,
-                model=model,
+                model=shap_e_model,
                 diffusion=diffusion,
                 xm=xm,
                 batch_size=batch_size,
                 guidance_scale=guidance_scale,
             )
+        elif model == ObjectModel.HUNYUAN:
+            generate_hunyuan_model(hunyuan_server_url=server_url, object_name=object_name, output_file=output_file)
         else:
-            generate_hunyuan_model(
-                hunyuan_server_url=hunyuan_server_url, object_name=object_name, output_file=output_file
-            )
+            raise ValueError(f"Unknown object model: {model}")
 
         logger.debug(f"Successfully generated model file: {output_file}")
 

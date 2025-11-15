@@ -7,8 +7,8 @@ from pathlib import Path
 import typer
 
 from scene_classes import Scene
-from model_generation import generate_object_models, slugify
-from background_generation import generate_background_image
+from model_generation import generate_object_models, slugify, ObjectModel
+from background_generation import generate_background_image, BackgroundModel
 
 # Configure logging
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -141,23 +141,43 @@ def generate_scene(
 
     # Generate object models
     models_start = time.time()
+    # Determine which model to use based on provided URL
+    if hunyuan_server_url:
+        object_model = ObjectModel.HUNYUAN
+        object_server_url = hunyuan_server_url
+    else:
+        object_model = ObjectModel.SHAP_E
+        object_server_url = None
+
     generate_object_models(
         scene,
         output_dir,
+        model=object_model,
+        server_url=object_server_url,
         batch_size=model_batch_size,
         guidance_scale=model_guidance_scale,
-        hunyuan_server_url=hunyuan_server_url,
     )
     models_duration = time.time() - models_start
     logger.debug(f"Object models generated in {models_duration:.2f}s, generating background")
 
     # Generate background
     background_start = time.time()
+    # Determine which model to use based on provided URLs
+    if hunyuan_panorama_server_url:
+        background_model = BackgroundModel.HUNYUAN_PANORAMA
+        server_url = hunyuan_panorama_server_url
+    elif stitch_diffusion_server_url:
+        background_model = BackgroundModel.STITCH_DIFFUSION
+        server_url = stitch_diffusion_server_url
+    else:
+        background_model = BackgroundModel.STABLE_DIFFUSION
+        server_url = None
+
     generate_background_image(
         scene,
         output_dir,
-        hunyuan_panorama_server_url=hunyuan_panorama_server_url,
-        stitch_diffusion_server_url=stitch_diffusion_server_url,
+        model=background_model,
+        server_url=server_url,
     )
     background_duration = time.time() - background_start
     logger.debug(f"Background generated in {background_duration:.2f}s")
@@ -204,7 +224,19 @@ def models(
         scene_dict = json.load(f)
     s = Scene.model_validate(scene_dict)
     logger.debug(f"Scene loaded with {len(s.objects)} objects")
-    generate_object_models(s, hunyuan_server_url=hunyuan_server_url)
+    # Determine which model to use based on provided URL
+    if hunyuan_server_url:
+        object_model = ObjectModel.HUNYUAN
+        object_server_url = hunyuan_server_url
+    else:
+        object_model = ObjectModel.SHAP_E
+        object_server_url = None
+
+    generate_object_models(
+        s,
+        model=object_model,
+        server_url=object_server_url,
+    )
     logger.debug("Model generation completed")
 
 
@@ -221,10 +253,21 @@ def background(
         scene_dict = json.load(f)
     s = Scene.model_validate(scene_dict)
     logger.debug("Scene loaded, generating background")
+    # Determine which model to use based on provided URLs
+    if hunyuan_panorama_server_url:
+        background_model = BackgroundModel.HUNYUAN_PANORAMA
+        server_url = hunyuan_panorama_server_url
+    elif stitch_diffusion_server_url:
+        background_model = BackgroundModel.STITCH_DIFFUSION
+        server_url = stitch_diffusion_server_url
+    else:
+        background_model = BackgroundModel.STABLE_DIFFUSION
+        server_url = None
+
     generate_background_image(
         s,
-        hunyuan_panorama_server_url=hunyuan_panorama_server_url,
-        stitch_diffusion_server_url=stitch_diffusion_server_url,
+        model=background_model,
+        server_url=server_url,
     )
     logger.debug("Background generation completed")
 

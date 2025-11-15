@@ -1,5 +1,6 @@
 import logging
 import os
+from enum import Enum
 from pathlib import Path
 
 import requests
@@ -10,6 +11,12 @@ from scene_classes import Scene
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
+
+class BackgroundModel(str, Enum):
+    STABLE_DIFFUSION = "stable_diffusion"
+    HUNYUAN_PANORAMA = "hunyuan_panorama"
+    STITCH_DIFFUSION = "stitch_diffusion"
 
 
 def save_background_image(
@@ -49,22 +56,26 @@ def save_background_image(
 def generate_background_image(
     scene: Scene,
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
-    hunyuan_panorama_server_url: str | None = None,
-    stitch_diffusion_server_url: str | None = None,
+    model: BackgroundModel = BackgroundModel.STABLE_DIFFUSION,
+    server_url: str | None = None,
 ) -> None:
     """
     Generate a background image for the scene in the output directory
     Args:
         scene (Scene): The scene containing objects to generate
         output_dir (Path): The directory to save the generated GLB files
-        hunyuan_panorama_server_url (str | None): The URL of the Hunyuan panorama server, if used
+        model (BackgroundModel): The model to use for background generation
+        server_url (str | None): The URL of the server for remote models
     Returns:
         None
     """
 
-    if hunyuan_panorama_server_url is not None:
+    if model == BackgroundModel.HUNYUAN_PANORAMA:
+        if server_url is None:
+            raise ValueError("server_url is required for HUNYUAN_PANORAMA model")
+
         object_request = requests.get(
-            f"{hunyuan_panorama_server_url}/generate-panorama",
+            f"{server_url}/generate-panorama",
             params={
                 "prompt": scene.scene_skybox_prompt,
                 "negative_prompt": scene.scene_skybox_negative_prompt,
@@ -74,9 +85,13 @@ def generate_background_image(
         background_file_path = output_dir / "background.png"
         with open(background_file_path, "wb") as f:
             f.write(object_request.content)
-    elif stitch_diffusion_server_url is not None:
+
+    elif model == BackgroundModel.STITCH_DIFFUSION:
+        if server_url is None:
+            raise ValueError("server_url is required for STITCH_DIFFUSION model")
+
         object_request = requests.post(
-            f"{stitch_diffusion_server_url}/generate/file",
+            f"{server_url}/generate/file",
             json={
                 "prompt": scene.scene_skybox_prompt,
                 "negative_prompt": scene.scene_skybox_negative_prompt,
@@ -86,5 +101,9 @@ def generate_background_image(
         background_file_path = output_dir / "background.png"
         with open(background_file_path, "wb") as f:
             f.write(object_request.content)
-    else:
+
+    elif model == BackgroundModel.STABLE_DIFFUSION:
         save_background_image(scene, output_dir)
+
+    else:
+        raise ValueError(f"Unknown background model: {model}")
