@@ -39,17 +39,18 @@ public class GenerateMultipleScenes
         string[] sceneDirs = Directory.GetDirectories(ScenesDirectory);
         foreach (string dir in sceneDirs)
         {
-            LoadAndPlaceScene(dir);
             string jsonPath = Path.Combine(dir, "scene.json");
             if (File.Exists(jsonPath))
             {
                 Debug.Log($"Processing scene: {dir}");
+                LoadAndPlaceScene(dir);
             }
             else
             {
                 Debug.LogWarning($"No scene.json found in {dir}");
             }
         }
+        AssetDatabase.Refresh();
     }
 
     static Bounds GetBounds(GameObject go)
@@ -193,6 +194,13 @@ public class GenerateMultipleScenes
 
         EditorSceneManager.SaveScene(resultScene, Path.Combine(dir, "Scene.unity"));
 
-        CameraUtils.TakeScreenshot(Path.Combine(dir, "screenshot.png"), 1920, 1080);
+        EditorApplication.delayCall += () =>
+        {
+            SceneView.RepaintAll();
+            EditorApplication.delayCall += () =>
+            {
+                CameraUtils.TakeScreenshot(Path.Combine(dir, "screenshot.png"), 1920, 1080);
+            };
+        };
     }
 }

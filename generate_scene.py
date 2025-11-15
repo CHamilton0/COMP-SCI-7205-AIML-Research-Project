@@ -226,6 +226,9 @@ def batch_generate(
 
     for idx, prompt in enumerate(prompts, 1):
         logger.info(f"Processing prompt {idx}/{len(prompts)}: {prompt}")
+        if prompt.startswith("#"):
+            logger.info(f"Skipping comment prompt: {prompt}")
+            continue
 
         safe_prompt = slugify(prompt)[:50]
         iteration_output_directory = output_dir / f"{formatted_time}-{idx:03d}-{safe_prompt}"
