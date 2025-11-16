@@ -1,0 +1,3 @@
+[submodule "modules/SD-T2I-360PanoImage"]
+	path = modules/SD-T2I-360PanoImage
+	url = https://github.com/ArcherFMY/SD-T2I-360PanoImage.git
