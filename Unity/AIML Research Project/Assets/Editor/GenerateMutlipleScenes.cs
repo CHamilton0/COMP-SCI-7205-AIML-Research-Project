@@ -10,6 +10,7 @@ public class GenerateMultipleScenes
 {
     private static readonly string ScenesDirectory = "Assets/generated-scenes";
 
+    // JSON data classes for representation of scene generated from Python code
     [System.Serializable]
     public class JSONSceneObject
     {
@@ -40,6 +41,7 @@ public class GenerateMultipleScenes
         ProcessNextScene(sceneDirs, 0);
     }
 
+    // Process the scenes in order
     private static void ProcessNextScene(string[] sceneDirs, int index)
     {
         if (index >= sceneDirs.Length)

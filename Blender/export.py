@@ -17,12 +17,12 @@ def create_vertex_color_material(obj: Any, mat_name: str = "VertexColorMat") -> 
     # Add Vertex Color node
     vc_node = nodes.new(type="ShaderNodeVertexColor")
 
-    # Use the first vertex color layer (usually named 'Col')
+    # Get the vertex color layer
     if obj.data.vertex_colors:
         vc_node.layer_name = obj.data.vertex_colors[0].name
     else:
         print(f"Warning: No vertex color layer found on object {obj.name}")
-        vc_node.layer_name = "Col"  # default fallback
+        vc_node.layer_name = "Col"
 
     # Link Vertex Color output to Base Color input
     links.new(vc_node.outputs["Color"], bsdf.inputs["Base Color"])
@@ -37,7 +37,6 @@ def create_vertex_color_material(obj: Any, mat_name: str = "VertexColorMat") -> 
 def main() -> None:
     argv = sys.argv
 
-    # get args after '--'
     args_start_index = argv.index("--") + 1
     argv = argv[args_start_index:]
 
@@ -48,10 +47,10 @@ def main() -> None:
     input_file = argv[0]
     output_file = argv[1]
 
-    # Clear existing scene
+    # Reset to factory settings
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
-    # Import model based on file extension
+    # Import model
     ext = input_file.split(".")[-1].lower()
     if ext == "ply":
         bpy.ops.import_mesh.ply(filepath=input_file)

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import typer
 
-from scene_classes import SceneImageAnalysisResult, SceneImageRatingResult
+from scene_classes import Scene, SceneImageAnalysisResult, SceneImageRatingResult
 
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 logging.basicConfig(level=log_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -20,13 +20,13 @@ def encode_image(image_path: Path):
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 
-def analyse_scene_images(
+def compare_scene_images(
     image_path1: Path,
     image_path2: Path,
     scene_prompt: str,
 ) -> SceneImageAnalysisResult:
     """
-    Analyze two scene images and determine which better represents the scene described by the prompt.
+    Compares two scene images and determine which better represents the scene described by the prompt.
     Args:
         image_path1 (Path): The file path to the first image.
         image_path2 (Path): The file path to the second image.
@@ -34,11 +34,11 @@ def analyse_scene_images(
     Returns:
         SceneImageAnalysisResult: The analysis result indicating which image is better.
     """
-    logger.debug(f"get_objects_in_scene called with image_paths: {image_path1} and {image_path2}")
+    logger.debug(f"compare_scene_images called with image_paths: {image_path1} and {image_path2}")
     from openai import OpenAI
 
     openai_client = OpenAI()
-    logger.debug("Generating object list with LLM")
+    logger.debug("Comparing scene images with LLM")
     response = openai_client.responses.parse(
         model="gpt-4.1",
         input=[
@@ -107,13 +107,13 @@ def get_best_scene(
             continue
 
         logger.debug(f"Comparing images: {image1} and {image2}")
-        analysis_result = analyse_scene_images(image1, image2, scene_prompt)
+        analysis_result = compare_scene_images(image1, image2, scene_prompt)
 
         if analysis_result.first_image_better_scene:
-            scene_directories.append(dir1)  # Keep the better scene for further comparison
+            scene_directories.append(dir1)  # Keep the better scene for the next round
             logger.info(f"Selected better scene: {dir1}")
         else:
-            scene_directories.append(dir2)  # Keep the better scene for further comparison
+            scene_directories.append(dir2)  # Keep the better scene for the next round
             logger.info(f"Selected better scene: {dir2}")
 
     if scene_directories:
@@ -141,7 +141,7 @@ def evaluate_scenes(
         logger.error("Not enough scene directories found.")
         return
 
-    # Create pairs of images to compare until only one best scene remains
+    # Loop through all generated scenes and evaluate them
     for scene_dir in scene_directories:
         prompt_file = scene_dir / "prompt.txt"
         image_path = scene_dir / "screenshot.png"
@@ -191,6 +191,7 @@ def evaluate_scenes(
 @app.command()
 def produce_average_results(
     generated_scenes_directory: Path = Path("./Unity/AIML Research Project/Assets/generated-scenes"),
+    output_scene_objects: bool = False,
 ) -> None:
     """
     Produce average results from the evaluations of generated scene images based on the scene prompt.
@@ -212,7 +213,7 @@ def produce_average_results(
         logger.error("Not enough scene directories found.")
         return
 
-    # Create pairs of images to compare until only one best scene remains
+    # Loop through generated scenes to get the results from the evaluation
     for scene_dir in scene_directories:
         eval_file = scene_dir / "evaluation.json"
         if not eval_file.exists():
@@ -222,14 +223,21 @@ def produce_average_results(
             with open(eval_file, "r") as f:
                 eval_data: SceneImageRatingResult = SceneImageRatingResult.model_validate_json(f.read())
 
+                # Get the average of the scores from the evaluation
                 average = (eval_data.background_score + eval_data.objects_score + eval_data.layout_score) / 3.0
-                logger.info(f"Average score for scene in {scene_dir}: {average}")
                 results.append({"average": average, "scene_dir": scene_dir})
 
     results.sort(key=lambda x: x["average"], reverse=True)
     logger.info("Scenes ranked by average score:")
     for result in results:
         logger.info(f"Scene: {result['scene_dir']}, Average Score: {result['average']}")
+        if output_scene_objects:
+            result_scene_file = result["scene_dir"] / "scene.json"
+            if result_scene_file.exists():
+                with open(result_scene_file, "r") as f:
+                    scene: Scene = Scene.model_validate_json(f.read())
+                    object_names = [obj.name for obj in scene.objects]
+                    logger.info(f"Objects in scene: {object_names}")
 
 
 if __name__ == "__main__":

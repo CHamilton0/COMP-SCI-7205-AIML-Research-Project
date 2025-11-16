@@ -11,17 +11,19 @@ public class AutoSkyboxProcessor : AssetPostprocessor
             Debug.LogError("Skybox material is null.");
             return;
         }
-        // Load texture
+        // Load image as texture
         Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(pngAssetPath);
         if (tex == null)
         {
             Debug.LogError("Failed to load texture: " + pngAssetPath);
             return;
         }
+        // Create the skybox material
         skyboxMat.shader = Shader.Find("Skybox/Panoramic");
         skyboxMat.SetTexture("_MainTex", tex);
-        skyboxMat.SetFloat("_Mapping", 1);    // Latitude-Longitude layout
+        skyboxMat.SetFloat("_Mapping", 1);    // Latitude-Longitude layout for panorama background
         skyboxMat.SetFloat("_ImageType", 0);  // 2D texture
+        
         EditorUtility.SetDirty(skyboxMat);
         AssetDatabase.SaveAssets();
         

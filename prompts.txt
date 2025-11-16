@@ -78,29 +78,44 @@
 # an advanced hydroponics farm in space with countless plants in glowing growth chambers lit by colorful LED arrays
 # a futuristic traffic control station monitoring hundreds of colorful ship trajectories with glowing holographic navigation markers
 # a space rave venue with dozens of floating DJ platforms colorful laser arrays and hundreds of glowing geometric light fixtures
-a white space shuttle with orange fuel tank and two white boosters launching through clouds with trailing white smoke
-multiple silver satellites with blue solar panels orbiting above a blue and green Earth
-a large modular space station with white modules and golden solar arrays floating in orbit above Earth
-a tall white rocket standing on a launch pad with red service tower and surrounding ground equipment
-a grey lunar lander on the moon surface with Earth visible in the black sky above
-a red rover vehicle on the orange Martian surface with rocks and distant mountains
-a silver telescope with solar panels floating in space with a colorful nebula behind it
-a green and white capsule spacecraft docking with a space station module
-a grey rocky asteroid tumbling through space with a small probe nearby
-the blue planet Neptune with a grey moon orbiting around it
-golden Saturn with its beige ring system and several small moons
-a golden space probe flying past the orange and white striped gas giant Jupiter
-the grey cratered moon surface with a silver rover and blue Earth on the horizon
-white icy surface of Europa with cracks and a small landing probe
-pale yellow Venus with white clouds and several atmospheric probes orbiting it
-a ring of communication satellites with orange solar panels in orbit around Earth
-grey Mercury surface with craters and a small lander under bright sunlight
-a white and red orbital station circling above the orange planet Mars
-a grey comet with blue glowing tail passing near several tracking probes
-industrial equipment on a dark asteroid with silver containers and orange lights
-a lunar base with white habitats and equipment on grey moon surface with Earth above
-multiple white satellites with instruments and golden panels above Earth's oceans
-a silver deep space probe traveling away from distant blue Earth
-a white capsule with heat shield approaching a space station with Earth below
-a space station with white modules and blue panels orbiting above continents and oceans
-a Mars orbital view with red planet surface multiple white satellites and space station in foreground
+# a white space shuttle with orange fuel tank and two white boosters launching through clouds with trailing white smoke
+# multiple silver satellites with blue solar panels orbiting above a blue and green Earth
+# a large modular space station with white modules and golden solar arrays floating in orbit above Earth
+# a tall white rocket standing on a launch pad with red service tower and surrounding ground equipment
+# a grey lunar lander on the moon surface with Earth visible in the black sky above
+# a red rover vehicle on the orange Martian surface with rocks and distant mountains
+# a silver telescope with solar panels floating in space with a colorful nebula behind it
+# a green and white capsule spacecraft docking with a space station module
+# a grey rocky asteroid tumbling through space with a small probe nearby
+# the blue planet Neptune with a grey moon orbiting around it
+# golden Saturn with its beige ring system and several small moons
+# a golden space probe flying past the orange and white striped gas giant Jupiter
+# the grey cratered moon surface with a silver rover and blue Earth on the horizon
+# white icy surface of Europa with cracks and a small landing probe
+# pale yellow Venus with white clouds and several atmospheric probes orbiting it
+# a ring of communication satellites with orange solar panels in orbit around Earth
+# grey Mercury surface with craters and a small lander under bright sunlight
+# a white and red orbital station circling above the orange planet Mars
+# a grey comet with blue glowing tail passing near several tracking probes
+# industrial equipment on a dark asteroid with silver containers and orange lights
+# a lunar base with white habitats and equipment on grey moon surface with Earth above
+# multiple white satellites with instruments and golden panels above Earth's oceans
+# a silver deep space probe traveling away from distant blue Earth
+# a white capsule with heat shield approaching a space station with Earth below
+# a space station with white modules and blue panels orbiting above continents and oceans
+# a Mars orbital view with red planet surface multiple white satellites and space station in foreground
+a space anomaly with strange geometric structures floating in zero gravity
+a space scene with multiple planets and asteroids floating in the void
+a space station floating among satellites and space debris
+a binary star system with orbiting planets
+a distant exoplanet system viewed from deep space
+a magnetar with visible magnetic field lines distorting space
+an alien solar system with multiple moons and gas giants
+a gravitational wave observatory floating in solar orbit
+a spacecraft graveyard floating in the depths of space
+an alien botanical station with dozens of bioluminescent plants in vibrant colors floating freely in zero gravity
+a cybernetic workshop filled with countless glowing robotic parts cybernetic implants and colorful holographic assembly instructions
+a nebula with colorful gas clouds and distant stars
+a futuristic command center with walls covered in glowing multicolored screens holographic projections and floating data cubes
+a gas giant's upper atmosphere with floating research platforms
+a space scene with floating space rocks and ancient alien artifacts

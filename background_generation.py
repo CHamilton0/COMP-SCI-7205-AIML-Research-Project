@@ -14,12 +14,16 @@ logger = logging.getLogger(__name__)
 
 
 class BackgroundModel(str, Enum):
+    """
+    Indicates the model to use for background generation.
+    """
+
     STABLE_DIFFUSION = "stable_diffusion"
     HUNYUAN_PANORAMA = "hunyuan_panorama"
-    STITCH_DIFFUSION = "stitch_diffusion"
+    DIFFUSION360 = "diffusion360"
 
 
-def save_background_image(
+def generate_stable_diffusion_background(
     scene: Scene,
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
 ) -> None:
@@ -74,6 +78,7 @@ def generate_background_image(
         if server_url is None:
             raise ValueError("server_url is required for HUNYUAN_PANORAMA model")
 
+        # Call the HunyuanWorld panorama generation model
         object_request = requests.get(
             f"{server_url}/generate-panorama",
             params={
@@ -86,10 +91,11 @@ def generate_background_image(
         with open(background_file_path, "wb") as f:
             f.write(object_request.content)
 
-    elif model == BackgroundModel.STITCH_DIFFUSION:
+    elif model == BackgroundModel.DIFFUSION360:
         if server_url is None:
-            raise ValueError("server_url is required for STITCH_DIFFUSION model")
+            raise ValueError("server_url is required for DIFFUSION360 model")
 
+        # Call the Diffusion360 panorama generation model
         object_request = requests.post(
             f"{server_url}/generate/file",
             json={
@@ -103,7 +109,8 @@ def generate_background_image(
             f.write(object_request.content)
 
     elif model == BackgroundModel.STABLE_DIFFUSION:
-        save_background_image(scene, output_dir)
+        # Generate the background using Stable Diffusion locally
+        generate_stable_diffusion_background(scene, output_dir)
 
     else:
         raise ValueError(f"Unknown background model: {model}")

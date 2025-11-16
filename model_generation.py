@@ -13,13 +13,17 @@ logger = logging.getLogger(__name__)
 
 
 class ObjectModel(str, Enum):
+    """
+    Indicates the model to use for object generation.
+    """
+
     SHAP_E = "shap_e"
     HUNYUAN = "hunyuan"
 
 
 def slugify(text: str) -> str:
     """
-    Generate a safe filename from the prompt.
+    Converts a string into a slugified version for filenames.
     Args:
         text (str): The input text to slugify.
     Returns:
@@ -81,7 +85,7 @@ def generate_shap_e_model(
             t.write_ply(f)
         logger.debug("PLY file written successfully")
 
-        # Call Blender to convert PLY → GLB
+        # Call Blender to convert PLY to GLB
         blender_script = Path("./Blender/export.py").resolve()
         command = [
             "blender",
@@ -153,6 +157,7 @@ def generate_object_models(
     logger.debug(f"Created GLB directory: {glb_dir}")
 
     if model == ObjectModel.SHAP_E:
+        # Set up the Shap-E model
         import torch
         from shap_e.diffusion.gaussian_diffusion import diffusion_from_config
         from shap_e.models.download import load_config, load_model
@@ -165,6 +170,7 @@ def generate_object_models(
         diffusion = diffusion_from_config(load_config("diffusion"))
         logger.debug("Successfully loaded all Shap-E models")
     elif model == ObjectModel.HUNYUAN:
+        # Ensure Hunyuan3D server URL is provided if the model is selected
         if server_url is None:
             raise ValueError("server_url is required for HUNYUAN model")
 

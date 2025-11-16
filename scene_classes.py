@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+# Utility classes for generation of 3D scenes
+
 
 class Vector3(BaseModel):
     x: float

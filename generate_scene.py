@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import warnings
@@ -10,21 +9,21 @@ from scene_classes import Scene
 from model_generation import generate_object_models, slugify, ObjectModel
 from background_generation import generate_background_image, BackgroundModel
 
-# Configure logging
+# Configure logging to save to a file
 log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 log_file = Path("scene_generation.log")
 logging.basicConfig(
     level=log_level,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler(log_file, mode="a"),  # Append mode
+        logging.FileHandler(log_file, mode="a"),  # Append mode to not lose logs
         logging.StreamHandler(),  # Also output to console
     ],
-    force=True,  # Override any existing logging configuration
+    force=True,  # Override any existing logging configuration from other modules
 )
 logger = logging.getLogger(__name__)
 
-# Hide future warnings from shap_e
+# Hide future warnings from shap_e in logs
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 
@@ -114,7 +113,9 @@ def generate_scene(
 
     Args:
         prompt (str): The text prompt describing the desired scene.
-        hunyuan_server_url (str | None): The URL of the Hunyuan server, if used.
+        hunyuan_server_url (str | None): The URL of the Hunyuan3D server, if used.
+        hunyuan_panorama_server_url (str | None): The URL of the HunyuanWorld panorama server, if used.
+        stitch_diffusion_server_url (str | None): The URL of the Stitch Diffusion server, if used.
         output_dir (Path): The directory to save generated assets.
         model_batch_size (int): The batch size for model generation.
         model_guidance_scale (float): The guidance scale for model generation.
@@ -190,88 +191,6 @@ def generate_scene(
     )
 
 
-@app.command()
-def generate_scene_layout(prompt: str) -> None:
-    """
-    Generate a scene layout using an LLM based on the provided prompt and print the JSON.
-    Args:
-        prompt (str): The text prompt describing the desired scene.
-    Returns:
-        None
-    """
-    logger.debug(f"generate_scene_layout called with prompt: {prompt}")
-    scene = generate_scene_object(prompt)
-    scene_json = scene.model_dump_json(indent=4)
-    logger.info(scene_json)
-    logger.debug("Scene layout generated")
-
-
-@app.command(help="Generate GLB models for each object from the existing scene.json.")
-def models(
-    hunyuan_server_url: str | None = None,
-) -> None:
-    """
-    Read scene.json and generate GLB models for unique object names.
-    Args:
-        hunyuan_server_url (str | None): The URL of the Hunyuan server, if used.
-    Returns:
-        None
-    """
-    logger.debug("models command called")
-    scene_file_path = "./Unity/AIML Research Project/Assets/scene.json"
-    logger.debug(f"Reading scene from: {scene_file_path}")
-    with open(scene_file_path) as f:
-        scene_dict = json.load(f)
-    s = Scene.model_validate(scene_dict)
-    logger.debug(f"Scene loaded with {len(s.objects)} objects")
-    # Determine which model to use based on provided URL
-    if hunyuan_server_url:
-        object_model = ObjectModel.HUNYUAN
-        object_server_url = hunyuan_server_url
-    else:
-        object_model = ObjectModel.SHAP_E
-        object_server_url = None
-
-    generate_object_models(
-        s,
-        model=object_model,
-        server_url=object_server_url,
-    )
-    logger.debug("Model generation completed")
-
-
-@app.command(help="Generate a background image using the skybox prompt from scene.json.")
-def background(
-    hunyuan_panorama_server_url: str | None = None,
-    stitch_diffusion_server_url: str | None = None,
-) -> None:
-    """Generate the skybox image only (using Stable Diffusion)"""
-    logger.debug("background command called")
-    scene_file_path = "./Unity/AIML Research Project/Assets/scene.json"
-    logger.debug(f"Reading scene from: {scene_file_path}")
-    with open(scene_file_path) as f:
-        scene_dict = json.load(f)
-    s = Scene.model_validate(scene_dict)
-    logger.debug("Scene loaded, generating background")
-    # Determine which model to use based on provided URLs
-    if hunyuan_panorama_server_url:
-        background_model = BackgroundModel.HUNYUAN_PANORAMA
-        server_url = hunyuan_panorama_server_url
-    elif stitch_diffusion_server_url:
-        background_model = BackgroundModel.STITCH_DIFFUSION
-        server_url = stitch_diffusion_server_url
-    else:
-        background_model = BackgroundModel.STABLE_DIFFUSION
-        server_url = None
-
-    generate_background_image(
-        s,
-        model=background_model,
-        server_url=server_url,
-    )
-    logger.debug("Background generation completed")
-
-
 @app.command(help="Generate scenes from a list of prompts in a file.")
 def batch_generate(
     prompts_file: Path = Path("./prompts.txt"),
@@ -290,6 +209,7 @@ def batch_generate(
         output_dir (Path): Base directory for generated scenes.
         hunyuan_server_url (str | None): URL of the Hunyuan server, if used.
         hunyuan_panorama_server_url (str | None): URL of the Hunyuan panorama server, if used.
+        stitch_diffusion_server_url (str | None): URL of the Stitch Diffusion server, if used.
         model_batch_size (int): Batch size for model generation.
         model_guidance_scale (float): Guidance scale for model generation.
     """
