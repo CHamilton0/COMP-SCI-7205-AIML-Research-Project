@@ -1,3 +1,6 @@
 [submodule "modules/SD-T2I-360PanoImage"]
 	path = modules/SD-T2I-360PanoImage
 	url = https://github.com/ArcherFMY/SD-T2I-360PanoImage.git
+[submodule "modules/HunyuanWorld-1.0"]
+	path = modules/HunyuanWorld-1.0
+	url = https://github.com/Tencent-Hunyuan/HunyuanWorld-1.0.git
