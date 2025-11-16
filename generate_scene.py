@@ -103,7 +103,7 @@ def generate_scene(
     prompt: str,
     hunyuan_server_url: str | None = None,
     hunyuan_panorama_server_url: str | None = None,
-    stitch_diffusion_server_url: str | None = None,
+    diffusion360_server_url: str | None = None,
     output_dir: Path = Path("./Unity/AIML Research Project/Assets"),
     model_batch_size: int = 1,
     model_guidance_scale: float = 15.0,
@@ -115,7 +115,7 @@ def generate_scene(
         prompt (str): The text prompt describing the desired scene.
         hunyuan_server_url (str | None): The URL of the Hunyuan3D server, if used.
         hunyuan_panorama_server_url (str | None): The URL of the HunyuanWorld panorama server, if used.
-        stitch_diffusion_server_url (str | None): The URL of the Stitch Diffusion server, if used.
+        diffusion360_server_url (str | None): The URL of the Stitch Diffusion server, if used.
         output_dir (Path): The directory to save generated assets.
         model_batch_size (int): The batch size for model generation.
         model_guidance_scale (float): The guidance scale for model generation.
@@ -167,9 +167,9 @@ def generate_scene(
     if hunyuan_panorama_server_url:
         background_model = BackgroundModel.HUNYUAN_PANORAMA
         server_url = hunyuan_panorama_server_url
-    elif stitch_diffusion_server_url:
-        background_model = BackgroundModel.STITCH_DIFFUSION
-        server_url = stitch_diffusion_server_url
+    elif diffusion360_server_url:
+        background_model = BackgroundModel.diffusion360
+        server_url = diffusion360_server_url
     else:
         background_model = BackgroundModel.STABLE_DIFFUSION
         server_url = None
@@ -197,7 +197,7 @@ def batch_generate(
     output_dir: Path = Path("./generated_scenes_test"),
     hunyuan_server_url: str | None = None,
     hunyuan_panorama_server_url: str | None = None,
-    stitch_diffusion_server_url: str | None = None,
+    diffusion360_server_url: str | None = None,
     model_batch_size: int = 50,
     model_guidance_scale: float = 10.0,
 ) -> None:
@@ -209,7 +209,7 @@ def batch_generate(
         output_dir (Path): Base directory for generated scenes.
         hunyuan_server_url (str | None): URL of the Hunyuan server, if used.
         hunyuan_panorama_server_url (str | None): URL of the Hunyuan panorama server, if used.
-        stitch_diffusion_server_url (str | None): URL of the Stitch Diffusion server, if used.
+        diffusion360_server_url (str | None): URL of the Stitch Diffusion server, if used.
         model_batch_size (int): Batch size for model generation.
         model_guidance_scale (float): Guidance scale for model generation.
     """
@@ -248,7 +248,7 @@ def batch_generate(
                 prompt,
                 hunyuan_server_url=hunyuan_server_url,
                 hunyuan_panorama_server_url=hunyuan_panorama_server_url,
-                stitch_diffusion_server_url=stitch_diffusion_server_url,
+                diffusion360_server_url=diffusion360_server_url,
                 output_dir=iteration_output_directory,
                 model_batch_size=model_batch_size,
                 model_guidance_scale=model_guidance_scale,
