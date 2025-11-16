@@ -135,7 +135,7 @@ def evaluate_scenes(
         [d for d in generated_scenes_directory.iterdir() if d.is_dir()],
         key=lambda d: d.stat().st_mtime,
         reverse=True,
-    )[:2]
+    )
 
     if not scene_directories or len(scene_directories) == 0:
         logger.error("Not enough scene directories found.")
@@ -166,11 +166,9 @@ def evaluate_scenes(
                         "content": [
                             {
                                 "type": "input_text",
-                                "text": (
-                                    "How well does this image represent the scene described by the following prompt?"
-                                    "Rate it in terms of background, objects, and layout with a score from 1 to 10:"
-                                    f"{scene_prompt}",
-                                ),
+                                "text": "How well does this image represent the scene described by the following"
+                                " prompt? Rate it in terms of background, objects, and layout with a score from 1"
+                                f" to 10: {scene_prompt}",
                             },
                             {
                                 "type": "input_image",
@@ -188,6 +186,50 @@ def evaluate_scenes(
             with open(result_file, "w") as f:
                 f.write(result.model_dump_json(indent=4))
             logger.info(f"Saved evaluation results to {result_file}")
+
+
+@app.command()
+def produce_average_results(
+    generated_scenes_directory: Path = Path("./Unity/AIML Research Project/Assets/generated-scenes"),
+) -> None:
+    """
+    Produce average results from the evaluations of generated scene images based on the scene prompt.
+    Args:
+        generated_scenes_directory (Path): The directory containing generated scenes.
+    """
+
+    logger.debug(
+        f"produce_average_results command called with generated_scenes_directory: {generated_scenes_directory}"
+    )
+    scene_directories = sorted(
+        [d for d in generated_scenes_directory.iterdir() if d.is_dir()],
+        key=lambda d: d.stat().st_mtime,
+        reverse=True,
+    )
+    results = []
+
+    if not scene_directories or len(scene_directories) == 0:
+        logger.error("Not enough scene directories found.")
+        return
+
+    # Create pairs of images to compare until only one best scene remains
+    for scene_dir in scene_directories:
+        eval_file = scene_dir / "evaluation.json"
+        if not eval_file.exists():
+            logger.error("No evaluation.json file found in scene directory.")
+            continue
+        else:
+            with open(eval_file, "r") as f:
+                eval_data: SceneImageRatingResult = SceneImageRatingResult.model_validate_json(f.read())
+
+                average = (eval_data.background_score + eval_data.objects_score + eval_data.layout_score) / 3.0
+                logger.info(f"Average score for scene in {scene_dir}: {average}")
+                results.append({"average": average, "scene_dir": scene_dir})
+
+    results.sort(key=lambda x: x["average"], reverse=True)
+    logger.info("Scenes ranked by average score:")
+    for result in results:
+        logger.info(f"Scene: {result['scene_dir']}, Average Score: {result['average']}")
 
 
 if __name__ == "__main__":

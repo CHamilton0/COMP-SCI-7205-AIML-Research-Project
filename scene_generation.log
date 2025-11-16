@@ -5555,3 +5555,11 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
 2025-11-15 18:36:31,272 - model_generation - DEBUG - slugify called with text: White Habitat
 2025-11-15 18:36:31,272 - model_generation - DEBUG - slugify result: white-habitat
 2025-11-15 18:36:31,274 - urllib3.connectionpool - DEBUG - Starting new HTTP connection (1): 10.12.65.80:8080
+2025-11-15 18:59:36,553 - httpcore.connection - DEBUG - close.started
+2025-11-15 18:59:36,555 - httpcore.connection - DEBUG - close.complete
+2025-11-15 18:59:36,555 - httpcore.connection - DEBUG - close.started
+2025-11-15 18:59:36,555 - httpcore.connection - DEBUG - close.complete
+2025-11-15 18:59:36,556 - httpcore.connection - DEBUG - close.started
+2025-11-15 18:59:36,556 - httpcore.connection - DEBUG - close.complete
+2025-11-15 18:59:36,556 - httpcore.connection - DEBUG - close.started
+2025-11-15 18:59:36,557 - httpcore.connection - DEBUG - close.complete
