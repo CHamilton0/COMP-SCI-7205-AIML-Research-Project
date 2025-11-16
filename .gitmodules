@@ -4,3 +4,6 @@
 [submodule "modules/HunyuanWorld-1.0"]
 	path = modules/HunyuanWorld-1.0
 	url = https://github.com/Tencent-Hunyuan/HunyuanWorld-1.0.git
+[submodule "modules/Hunyuan3D-2"]
+	path = modules/Hunyuan3D-2
+	url = https://github.com/Tencent-Hunyuan/Hunyuan3D-2.git
