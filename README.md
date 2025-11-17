@@ -26,20 +26,36 @@ export LOG_LEVEL=debug
 ```
 
 ```bash
-uv run python generate_scene.py generate-scene "a space scene" 
+uv run python generate_scene.py generate-scene "a space scene"  <options>
 ```
+
+Run:
+
+```bash
+uv run python generate_scene.py generate-scene --help
+```
+
+for usage on the available options.
 
 ## Batch Scene Generation
 
 Add scene prompts to the `prompts.txt` file in this directory
 
 ```bash
-uv run python generate_scene.py batch-generate
+uv run python generate_scene.py batch-generate <options>
 ```
 
 The scene generation commands have options to pass in a URL for the Hunyuan3D model, the HunyuanWorld panorama model, or
 the Diffusion360 model. These models have been containerised so that APIs for each can run on available hardware to
 avoid memory issues and improve performance.
+
+Run:
+
+```bash
+uv run python generate_scene.py batch-generate --help
+```
+
+for usage on the available options.
 
 ## Running modules
 
