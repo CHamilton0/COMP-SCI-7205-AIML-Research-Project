@@ -1,0 +1,39 @@
+services:
+  hunyuanworld-runtime:
+    build:
+      context: .
+      dockerfile: Dockerfile.panorama-api
+    container_name: hunyuanworld-panorama-api
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - HF_TOKEN=${HF_TOKEN:-}
+      - CUDA_VISIBLE_DEVICES=0
+    command: ["sh", "-c", "pip install -r /api/requirements.txt && python /workspace/HunyuanWorld-1.0/HunyuanWorld-1.0/panorama_api.py"]
+    volumes:
+      # Mount the entire project for development
+      - .:/workspace/HunyuanWorld-1.0:rw
+      # Mount the startup script
+      - ./scripts:/workspace/scripts:rw
+      # Persistent cache volumes using local directories
+      - ./runtime_data/cache:/workspace/cache
+      - ./runtime_data/models:/workspace/models
+      - ./runtime_data/outputs:/workspace/outputs
+      # Persistent external tools to avoid re-downloading
+      - ./runtime_data/external_tools:/workspace/external_tools
+      # Persistent conda environments (optional but recommended)
+      - ./runtime_data/conda_envs:/opt/conda/envs
+      # Persistent conda package cache
+      - ./runtime_data/conda_pkgs:/opt/conda/pkgs
+    working_dir: /workspace/HunyuanWorld-1.0
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]

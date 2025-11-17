@@ -1,0 +1,7 @@
+FROM chamilton0/hunyuan-world:minimal
+
+# Create api directory
+RUN mkdir -p /api
+
+# Copy requirements first (for better layer caching)
+COPY requirements.txt /api/requirements.txt
