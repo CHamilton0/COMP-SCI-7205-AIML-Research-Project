@@ -168,7 +168,7 @@ def generate_scene(
         background_model = BackgroundModel.HUNYUAN_PANORAMA
         server_url = hunyuan_panorama_server_url
     elif diffusion360_server_url:
-        background_model = BackgroundModel.diffusion360
+        background_model = BackgroundModel.DIFFUSION360
         server_url = diffusion360_server_url
     else:
         background_model = BackgroundModel.STABLE_DIFFUSION
